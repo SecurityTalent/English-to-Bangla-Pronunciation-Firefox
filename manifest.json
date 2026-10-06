@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Bangla Phonetic Pronunciation",
-  "version": "1.0.1",
-  "description": "Ctrl ধরে English text select করলে ঠিক নিচে বাংলা phonetic pronunciation দেখায়।",
+  "version": "1.0.2",
+  "description": "Ctrl দিয়ে English pronunciation এবং Alt দিয়ে বাংলা অর্থ দেখুন।",
   "browser_specific_settings": {
     "gecko": {
       "id": "bangla-pronunciation@firefox.extension",
