@@ -7,3 +7,5 @@ Project changes are tracked under `specs/` before implementation. Each change fo
 - `tasks.md`: checklist updated as work progresses, including verification results.
 
 Keep `Requerment.md` as the product-level requirements source. Update the relevant specification and task status whenever behavior changes.
+
+The Alt + selection meaning feature is tracked in `007-alt-selection-meaning/`.

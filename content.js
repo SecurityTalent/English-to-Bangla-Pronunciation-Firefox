@@ -10,8 +10,10 @@
 
   // State management
   let isCtrlDown = false;
+  let isAltDown = false;
   let isMouseDown = false;
   let ctrlWasPressedDuringSelection = false;
+  let altWasPressedDuringSelection = false;
   let debounceTimer = null;
   let lastProcessedText = "";
   let currentRequestId = 0;
@@ -311,7 +313,7 @@
   /**
    * Process the user's Ctrl + selection
    */
-  function handleSelection() {
+  function handleSelection(mode = "pronunciation") {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
       removeBadge();
@@ -339,15 +341,16 @@
     }
 
     // Avoid duplicate requests for identical selection
-    if (text === lastProcessedText && badgeElement) {
+    const modeKey = `${mode}:${text}`;
+    if (modeKey === lastProcessedText && badgeElement) {
       return;
     }
 
     const rect = getSelectionRect();
     if (!rect) return;
 
-    lastProcessedText = text;
-    const cacheKey = text.toLowerCase();
+    lastProcessedText = modeKey;
+    const cacheKey = `${mode}:${text.toLowerCase()}`;
     const requestId = ++currentRequestId;
 
     // Check local client-side cache
@@ -363,7 +366,7 @@
     // Send request via background service to bypass CORS
     try {
       extApi.runtime.sendMessage(
-        { action: "GET_PRONUNCIATION", text: text },
+        { action: mode === "meaning" ? "GET_MEANING" : "GET_PRONUNCIATION", text: text },
         (response) => {
           // Check if this request is still the latest active one
           if (requestId !== currentRequestId) return;
@@ -381,9 +384,10 @@
             return;
           }
 
-          if (response && response.success && response.pronunciation) {
-            localCache.set(cacheKey, response.pronunciation);
-            showBadge(freshRect, "text", response.pronunciation);
+          const result = mode === "meaning" ? response?.meaning : response?.pronunciation;
+          if (response && response.success && result) {
+            localCache.set(cacheKey, result);
+            showBadge(freshRect, "text", result);
           } else if (response && response.needsApiKey) {
             showBadge(
               freshRect,
@@ -397,7 +401,7 @@
               "⚠️ Backend offline (run: npm start)"
             );
           } else {
-            const errMsg = (response && response.error) ? response.error : "উচ্চারণ পাওয়া যায়নি";
+            const errMsg = (response && response.error) ? response.error : (mode === "meaning" ? "অর্থ পাওয়া যায়নি" : "উচ্চারণ পাওয়া যায়নি");
             showBadge(freshRect, "warning", `⚠️ ${errMsg}`);
           }
         }
@@ -419,6 +423,10 @@
         ctrlWasPressedDuringSelection = true;
       }
     }
+    if (e.key === "Alt") {
+      isAltDown = true;
+      if (isMouseDown) altWasPressedDuringSelection = true;
+    }
 
     if (e.key === "Escape") {
       removeBadge();
@@ -430,12 +438,17 @@
       isCtrlDown = false;
       // Do not reset ctrlWasPressedDuringSelection here if mouse is still down!
     }
+    if (e.key === "Alt") isAltDown = false;
 
     // Support keyboard selection (e.g. Shift + Arrow with Ctrl)
-    if ((e.shiftKey || e.key.startsWith("Arrow")) && (e.ctrlKey || isCtrlDown)) {
+    if ((e.shiftKey || e.key.startsWith("Arrow")) && (e.ctrlKey || isCtrlDown || e.altKey || isAltDown)) {
+      const altActive = e.altKey || isAltDown;
+      const ctrlActive = e.ctrlKey || isCtrlDown;
+      const mode = altActive === ctrlActive ? null : (altActive ? "meaning" : "pronunciation");
+      if (!mode) return;
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        handleSelection();
+        handleSelection(mode);
       }, CONFIG.debounceMs);
     }
   }, { capture: true, passive: true });
@@ -447,8 +460,13 @@
       isMouseDown = true;
       if (e.ctrlKey || isCtrlDown) {
         ctrlWasPressedDuringSelection = true;
-      } else {
+      }
+      if (e.altKey || isAltDown) {
+        altWasPressedDuringSelection = true;
+      }
+      if (!(e.ctrlKey || isCtrlDown || e.altKey || isAltDown)) {
         ctrlWasPressedDuringSelection = false;
+        altWasPressedDuringSelection = false;
         // User clicked without Ctrl: remove existing badge immediately
         removeBadge();
       }
@@ -456,23 +474,28 @@
   }, { capture: true, passive: true });
 
   document.addEventListener("mousemove", (e) => {
-    if (isMouseDown && (e.ctrlKey || isCtrlDown)) {
-      ctrlWasPressedDuringSelection = true;
+    if (isMouseDown) {
+      if (e.ctrlKey || isCtrlDown) ctrlWasPressedDuringSelection = true;
+      if (e.altKey || isAltDown) altWasPressedDuringSelection = true;
     }
   }, { capture: true, passive: true });
 
   document.addEventListener("mouseup", (e) => {
+    const wasAltActive = e.altKey || isAltDown || altWasPressedDuringSelection;
     const wasCtrlActive = e.ctrlKey || isCtrlDown || ctrlWasPressedDuringSelection;
+    const mode = wasAltActive === wasCtrlActive ? null : (wasAltActive ? "meaning" : "pronunciation");
+    const shouldLookup = Boolean(mode);
 
     isMouseDown = false;
     ctrlWasPressedDuringSelection = false;
+    altWasPressedDuringSelection = false;
 
     clearTimeout(debounceTimer);
 
-    if (wasCtrlActive) {
+    if (shouldLookup) {
       // Short debounce keeps the result responsive while filtering selection noise.
       debounceTimer = setTimeout(() => {
-        handleSelection();
+        handleSelection(mode);
       }, CONFIG.debounceMs);
     } else {
       // Normal selection without Ctrl: do nothing and remove any previous result

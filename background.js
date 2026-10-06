@@ -269,6 +269,44 @@ async function fetchPronunciation(text) {
   }
 }
 
+// Fetch a Bengali meaning with a cache namespace separate from pronunciations.
+async function fetchMeaning(text) {
+  const settings = await getStoredSettings();
+  const cacheKey = text.trim().toLowerCase();
+  const storageKey = `bpp_meaning_${cacheKey}`;
+  if (settings.cacheEnabled) {
+    try {
+      const cached = await extApi.storage.local.get(storageKey);
+      if (cached?.[storageKey]) return { success: true, meaning: cached[storageKey], source: "extension-storage-cache" };
+    } catch (e) { /* Continue to backend. */ }
+  }
+
+  const backendUrl = settings.backendUrl.replace(/\/api\/pronunciation\/?$/, "/api/meaning");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  try {
+    const response = await fetch(backendUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    const data = await response.json();
+    if (!response.ok) return { success: false, error: data.error || `Server responded with HTTP ${response.status}`, needsApiKey: data.needsApiKey || false };
+    if (!data?.meaning) return { success: false, error: "No meaning returned by server." };
+    if (settings.cacheEnabled) {
+      try { await extApi.storage.local.set({ [storageKey]: data.meaning }); } catch (e) { /* Non-critical cache write. */ }
+    }
+    return { success: true, meaning: data.meaning, source: data.source || "backend" };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    return err.name === "AbortError"
+      ? { success: false, error: "Backend request timed out (25s)." }
+      : { success: false, error: "Cannot connect to backend server.", unreachable: true };
+  }
+}
+
 // Health check to backend
 async function checkBackendHealth() {
   const settings = await getStoredSettings();
@@ -295,6 +333,13 @@ extApi.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: false, error: err.message });
       });
     return true; // Keep message channel open for async response
+  }
+
+  if (message.action === "GET_MEANING") {
+    fetchMeaning(message.text)
+      .then(sendResponse)
+      .catch(err => sendResponse({ success: false, error: err.message }));
+    return true;
   }
 
   if (message.action === "CHECK_HEALTH") {

@@ -1,7 +1,7 @@
 <div align="center">
   <img src="icons/icon.svg" alt="English to Bangla Pronunciation icon" width="88" height="88" />
   <h1>English to Bangla Pronunciation</h1>
-  <p>A Firefox extension for Bengali-script pronunciations of selected English text.</p>
+  <p>A Firefox extension for Bengali-script pronunciations and meanings of selected English text.</p>
   <p>A project by <a href="https://securitytalent.net">Security Talent</a>.</p>
 </div>
 
@@ -9,7 +9,7 @@
 
 ## Overview
 
-Hold **Ctrl** while selecting English text to see its phonetic pronunciation in Bengali near the selection. The extension transliterates pronunciation; it does not translate meaning.
+Hold **Ctrl** while selecting English text to see its phonetic pronunciation in Bengali. Hold **Alt** while selecting to see its Bengali meaning. Holding both modifiers together does not trigger a lookup.
 
 ```text
 Authentication
@@ -21,7 +21,8 @@ Authentication
 
 | Feature | Details |
 | --- | --- |
-| Ctrl + select | Requests a pronunciation only for Ctrl-assisted selections. |
+| Ctrl + select | Shows a Bengali-script phonetic pronunciation. |
+| Alt + select | Shows a concise Bengali meaning, using a separate API and cache. |
 | Inline result | Places a temporary badge near the selected text and adjusts its position to fit the viewport. |
 | Quick dismissal | Removes the badge when the selection is cleared, a normal selection is made, or Escape is pressed. |
 | Built-in dictionary | Returns common pronunciation entries without a Gemini request. |
@@ -31,7 +32,7 @@ Authentication
 ## How it works
 
 ```text
-Firefox content script → background script → pronunciation backend → Gemini API
+Firefox content script → background script → pronunciation or meaning backend → Gemini API
 ```
 
 The extension sends requests to the configured backend. The backend handles dictionary lookups, caching, and Gemini API calls. The Gemini API key stays on the backend and is never included in the extension package.
@@ -94,8 +95,8 @@ The smoke test uses port 3000. Stop the backend before running `npm test`.
 1. Open `about:debugging#/runtime/this-firefox`.
 2. Select **Load Temporary Add-on...**.
 3. Choose the project's `manifest.json`.
-4. Open `test_demo.html`, hold Ctrl, and select an English word such as “Authentication”.
-5. Release the mouse to see the Bengali pronunciation. Press Escape or clear the selection to dismiss it.
+4. Open `test_demo.html`. Hold Ctrl while selecting for pronunciation, or Alt while selecting for Bengali meaning.
+5. Release the mouse to see the result. Press Escape or clear the selection to dismiss it.
 
 Temporary add-ons are removed when Firefox restarts. Use an AMO-signed build for a persistent installation.
 
@@ -116,6 +117,10 @@ Successful response:
 ```
 
 The endpoint accepts up to 500 characters and rejects empty input. `GET /api/health` reports the service status, configured model, whether an API key is present, and the in-memory cache size. It does not return the API key.
+
+### `POST /api/meaning`
+
+Uses the same `{ "text": "..." }` request shape and input limit, and returns a concise Bengali translation in the `meaning` field. Pronunciation and meaning responses use independent caches.
 
 ## Production deployment
 
@@ -138,7 +143,7 @@ Render Free services sleep after inactivity and may take about a minute to wake.
 
 ## Privacy
 
-When a user selects text while holding Ctrl, the extension sends that text (up to 500 characters) to the configured backend. On a cache miss, the backend sends it to Gemini. Pronunciations and the backend URL are stored in Firefox extension storage; the backend also keeps a temporary in-memory cache.
+When a user selects text while holding Ctrl or Alt, the extension sends that text (up to 500 characters) to the configured backend. On a cache miss, the backend sends it to Gemini. Pronunciations and meanings use separate Firefox extension storage entries; the backend also keeps temporary in-memory caches.
 
 Before publication, verify the deployed service's actual data handling, replace the contact placeholder in [PRIVACY.md](PRIVACY.md), and publish the policy at a public URL. Disclose the text transfer and any provider retention in the AMO listing.
 
@@ -177,5 +182,5 @@ This project follows a lightweight Spec-Driven Development workflow. Change reco
 
 - **Backend offline:** run `npm start` from the project root for local development. Published builds need a reachable HTTPS backend, not `localhost`.
 - **Gemini API key required:** set `GEMINI_API_KEY` in the local `backend/.env` or the hosting provider's environment configuration, then restart the backend.
-- **No pronunciation appears:** hold Ctrl during selection and select English text of 500 characters or fewer. Common dictionary entries can work without a Gemini key.
+- **No result appears:** hold Ctrl for pronunciation or Alt for meaning while selecting English text of 500 characters or fewer. Common pronunciation dictionary entries can work without a Gemini key; generated meanings require a configured key.
 - **A previous backend is still running:** stop it before running `npm test`, because the smoke test uses port 3000.

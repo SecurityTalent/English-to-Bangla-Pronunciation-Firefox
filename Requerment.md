@@ -2,7 +2,7 @@
 
 ## Purpose
 
-When a user holds Ctrl and selects English text in Firefox, show a Bengali-script phonetic pronunciation near the selected text. The feature transliterates pronunciation; it must not translate meaning.
+When a user holds Ctrl and selects English text in Firefox, show a Bengali-script phonetic pronunciation near the selected text. When the user holds Alt and selects English text, show its Bengali meaning. These are separate actions and must never be confused.
 
 Examples:
 
@@ -15,6 +15,8 @@ Prototype Pollution   → প্রোটোটাইপ পলিউশন
 ## Selection behavior
 
 - Trigger only when Ctrl was held during mouse text selection.
+- Trigger a Bengali meaning lookup only when Alt was held during mouse text selection.
+- If Ctrl and Alt are held together, do not trigger a lookup.
 - Ordinary text selection must not request a pronunciation.
 - Do not rely only on `selectionchange`; track key and mouse state because Ctrl may be released before mouseup.
 - Do not block or modify browser shortcuts. In particular, never call `preventDefault()` for Ctrl+C, Ctrl+A, Ctrl+F, Ctrl+V, Ctrl+Z, or Ctrl+X.
@@ -36,10 +38,11 @@ Prototype Pollution   → প্রোটোটাইপ পলিউশন
 
 - The extension must not call Gemini directly. It sends requests through the configured backend.
 - Backend endpoint: `POST /api/pronunciation`.
+- Meaning endpoint: `POST /api/meaning`; return a concise Bengali translation, not a phonetic transliteration.
 - Request body: `{ "text": "Authentication" }`.
 - Successful response includes a Bengali-script `pronunciation` string.
 - Empty text and text over 500 characters must be rejected without calling Gemini.
-- Instruct Gemini to return only Bengali phonetic pronunciation: no translation, explanation, IPA, or English text.
+- Instruct Gemini to return only Bengali phonetic pronunciation for pronunciation requests and concise Bengali meaning for meaning requests.
 - The Gemini API key belongs only on the backend, never in the extension package.
 - The local-development default may use `http://localhost:3000/api/pronunciation`; any public release must configure a public HTTPS backend.
 
@@ -47,6 +50,7 @@ Prototype Pollution   → প্রোটোটাইপ পলিউশন
 
 - Check the built-in pronunciation dictionary before making a backend request.
 - Cache successful results in the extension and backend to reduce repeat API requests.
+- Keep meaning and pronunciation caches in separate namespaces.
 - Do not send duplicate requests for the same active selection.
 - A stale response must not replace or recreate a result for a newer/dismissed selection.
 - Provide a clear-cache action in settings.
@@ -67,10 +71,11 @@ Prototype Pollution   → প্রোটোটাইপ পলিউশন
 ## Acceptance criteria
 
 1. Ctrl + selection of valid English text displays a Bengali phonetic result after the short debounce.
-2. Ordinary selection does not issue a request and dismisses any previous result.
-3. Clearing the selection or pressing Escape dismisses the result.
-4. A late response cannot recreate a dismissed result.
-5. Empty, non-English-only, and over-limit selections do not call the backend.
-6. Browser shortcuts continue to work.
-7. Cached dictionary/API results are reused.
-8. Public release packages point to an HTTPS backend and do not contain API keys or local environment files.
+2. Alt + selection of valid English text displays its Bengali meaning after the short debounce.
+3. Ordinary selection and combined Ctrl+Alt selection do not issue a request and dismiss any previous result.
+4. Clearing the selection or pressing Escape dismisses the result.
+5. A late response cannot recreate a dismissed result.
+6. Empty, non-English-only, and over-limit selections do not call the backend.
+7. Browser shortcuts continue to work.
+8. Pronunciation and meaning caches are independent; cached results are reused only for the matching mode.
+9. Public release packages point to an HTTPS backend and do not contain API keys or local environment files.

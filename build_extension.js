@@ -63,8 +63,15 @@ try {
     stdio: "inherit"
   });
 
-  // Also create .xpi
-  fs.copyFileSync(ZIP_PATH, XPI_PATH);
+  // Create the XPI; if Windows has the existing version locked, keep it and
+  // write this build to a distinct filename instead of failing the release.
+  let generatedXpiPath = XPI_PATH;
+  try {
+    fs.copyFileSync(ZIP_PATH, generatedXpiPath);
+  } catch (copyError) {
+    generatedXpiPath = path.join(DIST_DIR, `bangla-phonetic-pronunciation-v${VERSION}-updated.xpi`);
+    execSync(`tar -a -cf "${generatedXpiPath}" *`, { cwd: BUILD_DIR, stdio: "inherit" });
+  }
 
   // Clean up temporary build folder
   fs.rmSync(BUILD_DIR, { recursive: true, force: true });
@@ -73,7 +80,7 @@ try {
   console.log("\n=========================================");
   console.log("🎉 Build Successful!");
   console.log(`📁 ZIP Package : ${ZIP_PATH} (${(stats.size / 1024).toFixed(1)} KB)`);
-  console.log(`📁 XPI Package : ${XPI_PATH}`);
+  console.log(`📁 XPI Package : ${generatedXpiPath}`);
   console.log("=========================================");
   console.log("Ready to upload directly to Mozilla Add-ons (AMO): https://addons.mozilla.org/developers/");
 } catch (err) {

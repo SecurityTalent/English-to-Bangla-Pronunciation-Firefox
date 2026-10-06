@@ -12,6 +12,7 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 
 // In-memory cache for fast lookups and API quota savings
 const pronunciationCache = new Map();
+const meaningCache = new Map();
 
 // Built-in offline dictionary for common tech words & demo words
 const builtinDictionary = {
@@ -88,15 +89,17 @@ app.get("/api/health", (req, res) => {
     status: "ok",
     hasApiKey: Boolean(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 0),
     model: GEMINI_MODEL,
-    cachedEntries: pronunciationCache.size
+    cachedEntries: pronunciationCache.size + meaningCache.size
   });
 });
 
 /**
  * Call Gemini API with strict system prompt
  */
-async function fetchGeminiPronunciation(text) {
-  const systemPrompt = `Act as an English-to-Bengali phonetic pronunciation assistant.
+async function fetchGeminiPronunciation(text, mode = "pronunciation") {
+  const systemPrompt = mode === "meaning"
+    ? `Act as an English-to-Bengali dictionary assistant. Give the concise Bengali meaning of the supplied English word or phrase. Do not transliterate its pronunciation, explain, or include English text. For an ambiguous isolated word, give its most common Bengali meaning. Return only Bengali script.`
+    : `Act as an English-to-Bengali phonetic pronunciation assistant.
 
 Convert the given English word or phrase into Bengali script based ONLY on how it is pronounced.
 
@@ -209,9 +212,12 @@ Return ONLY the Bengali phonetic pronunciation.`;
   throw lastError || new Error("Failed to contact Gemini API");
 }
 
-// POST /api/pronunciation
-app.post("/api/pronunciation", async (req, res) => {
+// POST /api/pronunciation and POST /api/meaning
+app.post(["/api/pronunciation", "/api/meaning"], async (req, res) => {
+  let mode = req.path.endsWith("/meaning") ? "meaning" : "pronunciation";
+  let resultField = mode;
   try {
+    const resultCache = mode === "meaning" ? meaningCache : pronunciationCache;
     const rawText = req.body?.text;
 
     if (!rawText || typeof rawText !== "string") {
@@ -237,16 +243,16 @@ app.post("/api/pronunciation", async (req, res) => {
     const cacheKey = text.toLowerCase();
 
     // 1. Check Cache
-    if (pronunciationCache.has(cacheKey)) {
-      const cached = pronunciationCache.get(cacheKey);
+    if (resultCache.has(cacheKey)) {
+      const cached = resultCache.get(cacheKey);
       return res.json({
-        pronunciation: cached,
+        [resultField]: cached,
         source: "cache"
       });
     }
 
     // 2. Check if GEMINI_API_KEY is configured
-    if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === "" || GEMINI_API_KEY === "your_gemini_api_key_here") {
+    if (mode === "pronunciation" && (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === "" || GEMINI_API_KEY === "your_gemini_api_key_here")) {
       // Check if words exist in dictionary individually
       const words = cacheKey.split(/\s+/);
       const parts = [];
@@ -277,25 +283,33 @@ app.post("/api/pronunciation", async (req, res) => {
     }
 
     // 3. Call Gemini API
-    const pronunciation = await fetchGeminiPronunciation(text);
+    if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === "" || GEMINI_API_KEY === "your_gemini_api_key_here") {
+      return res.status(503).json({
+        error: "Gemini API key is not configured. Please add GEMINI_API_KEY to backend/.env",
+        [resultField]: null,
+        needsApiKey: true
+      });
+    }
+
+    const result = await fetchGeminiPronunciation(text, mode);
 
     // Save in Cache (limit cache size to 10,000 items)
-    if (pronunciationCache.size > 10000) {
+    if (resultCache.size > 10000) {
       // delete oldest entry
-      const firstKey = pronunciationCache.keys().next().value;
-      pronunciationCache.delete(firstKey);
+      const firstKey = resultCache.keys().next().value;
+      resultCache.delete(firstKey);
     }
-    pronunciationCache.set(cacheKey, pronunciation);
+    resultCache.set(cacheKey, result);
 
     return res.json({
-      pronunciation: pronunciation,
+      [resultField]: result,
       source: "gemini"
     });
   } catch (error) {
     console.error("[Pronunciation API Error]:", error);
     return res.status(500).json({
-      error: error.message || "Failed to generate pronunciation.",
-      pronunciation: null
+      error: error.message || `Failed to generate ${mode}.`,
+      [resultField]: null
     });
   }
 });
@@ -304,6 +318,7 @@ app.listen(PORT, () => {
   console.log(`=================================================`);
   console.log(`🚀 Bangla Phonetic Backend running on http://localhost:${PORT}`);
   console.log(`📡 Endpoint: POST http://localhost:${PORT}/api/pronunciation`);
+  console.log(`📡 Meaning endpoint: POST http://localhost:${PORT}/api/meaning`);
   console.log(`🩺 Health check: GET http://localhost:${PORT}/api/health`);
   console.log(`🔑 Gemini API Key configured: ${Boolean(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 0)}`);
   console.log(`📚 Preloaded dictionary words: ${pronunciationCache.size}`);
