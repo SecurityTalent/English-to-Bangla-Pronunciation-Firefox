@@ -4,4 +4,4 @@
 - [x] Document dependency installation and the `EADDRINUSE` resolution.
 - [x] Document the production deployment and release checklist.
 - [x] Review documentation diff.
-- [ ] Commit and push to GitHub `main`.
+- [x] Commit and push to GitHub `main` (`271149c`).
