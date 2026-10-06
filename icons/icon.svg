@@ -1,32 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4f46e5" />
-      <stop offset="50%" stop-color="#7c3aed" />
-      <stop offset="100%" stop-color="#db2777" />
+    <linearGradient id="tile" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#18294B" />
+      <stop offset="1" stop-color="#10172D" />
     </linearGradient>
-    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.3" />
+    <linearGradient id="bubble" x1="23" y1="24" x2="92" y2="91" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#E8F0FF" />
+    </linearGradient>
+    <linearGradient id="wave" x1="98" y1="45" x2="119" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EEAD4" />
+      <stop offset="1" stop-color="#60A5FA" />
+    </linearGradient>
+    <filter id="shadow" x="8" y="9" width="112" height="112" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+      <feOffset dy="4" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.24" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
     </filter>
   </defs>
 
-  <!-- Background rounded rect -->
-  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bgGrad)" filter="url(#shadow)" />
+  <rect x="4" y="4" width="120" height="120" rx="34" fill="url(#tile)" />
+  <path d="M31 19h47c10 0 18 8 18 18v32c0 10-8 18-18 18H57L39 101V87h-8c-10 0-18-8-18-18V37c0-10 8-18 18-18Z" fill="url(#bubble)" filter="url(#shadow)" />
 
-  <!-- Inner subtle border -->
-  <rect x="9" y="9" width="110" height="110" rx="27" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2" />
+  <text x="38" y="62" text-anchor="middle" fill="#15233F" font-family="Arial, sans-serif" font-size="30" font-weight="700">A</text>
+  <circle cx="53" cy="57" r="2.5" fill="#38BDF8" />
+  <text x="72" y="64" text-anchor="middle" fill="#4F46E5" font-family="Nirmala UI, Noto Sans Bengali, sans-serif" font-size="34" font-weight="700">অ</text>
 
-  <!-- Letters: English 'A' on top left, Arrow, Bengali 'অ' on bottom right -->
-  <!-- Letter A -->
-  <text x="32" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="800" fill="#ffffff" text-anchor="middle">A</text>
-
-  <!-- Arrow -->
-  <path d="M 52 46 L 76 46 M 70 40 L 76 46 L 70 52" fill="none" stroke="#facc15" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-
-  <!-- Bengali letter অ -->
-  <text x="74" y="98" font-family="'Kalpurush', 'SolaimanLipi', 'Nirmala UI', sans-serif" font-size="44" font-weight="bold" fill="#ffffff" text-anchor="middle">অ</text>
-
-  <!-- Small sound waves / phonetic indicator -->
-  <path d="M 96 74 C 99 79 99 87 96 92" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round" />
-  <path d="M 103 69 C 108 76 108 90 103 97" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round" opacity="0.7" />
+  <path d="M99 45c5 6 5 19 0 25M106 39c9 9 9 28 0 37M113 34c12 12 12 38 0 49" fill="none" stroke="url(#wave)" stroke-linecap="round" stroke-width="3.5" />
+  <circle cx="103" cy="91" r="2.5" fill="#5EEAD4" />
 </svg>

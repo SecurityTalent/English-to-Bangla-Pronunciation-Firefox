@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="icons/icon-128.png" alt="English to Bangla Pronunciation icon" width="88" height="88" />
+  <img src="icons/icon.svg" alt="English to Bangla Pronunciation icon" width="88" height="88" />
   <h1>English to Bangla Pronunciation</h1>
   <p>A Firefox extension for instant Bengali-script pronunciations of selected English text.</p>
 </div>
@@ -146,7 +146,7 @@ AMO validation and review are not guaranteed. Build packages locally or attach t
 
 ```text
 backend/                 Express API, built-in dictionary, and smoke test
-icons/                   Extension icons
+icons/                   Extension's scalable vector icon
 specs/                   Specifications, plans, and task tracking
 background.js            Settings, cache, and backend requests
 content.js               Selection tracking and pronunciation badge
