@@ -1,353 +1,76 @@
-# Firefox Extension — Ctrl + Select → Selected Text-এর নিচে বাংলা উচ্চারণ
+# Product Requirements — English-to-Bangla Pronunciation Firefox Extension
 
-## মূল কাজ
+## Purpose
 
-Firefox-এ কোনো English text-এর উপর **Ctrl ধরে text select** করলে selection শেষ হওয়ার পর selected text-এর **ঠিক নিচে বাংলা phonetic pronunciation** দেখাতে হবে।
+When a user holds Ctrl and selects English text in Firefox, show a Bengali-script phonetic pronunciation near the selected text. The feature transliterates pronunciation; it must not translate meaning.
 
-এটি translation করবে না।
-
-### উদাহরণ
+Examples:
 
 ```text
-Authentication
-      ↓
-অথেন্টিকেশন
+Authentication       → অথেন্টিকেশন
+Vulnerability         → ভালনারেবিলিটি
+Prototype Pollution   → প্রোটোটাইপ পলিউশন
 ```
 
-```text
-Vulnerability
-      ↓
-ভালনারেবিলিটি
-```
-
-```text
-Prototype Pollution
-      ↓
-প্রোটোটাইপ পলিউশন
-```
-
----
-
-## Selection Rule
-
-শুধু তখনই কাজ করবে যখন:
-
-```text
-Ctrl + Text Selection
-```
-
-ব্যবহার করা হয়েছে।
-
-### Normal Selection
-
-```text
-English Text Select
-        ↓
-কিছুই হবে না
-```
-
-### Ctrl Selection
-
-```text
-Ctrl ধরে English Text Select
-        ↓
-Mouse Release
-        ↓
-Selected Text-এর নিচে বাংলা pronunciation
-```
-
----
-
-## Result Position
-
-Result কোনো floating popup হিসেবে তৈরি করা যাবে না।
-
-Selected text-এর `Range.getBoundingClientRect()` ব্যবহার করে result-এর position বের করতে হবে।
-
-Result:
-
-* selected text-এর নিচে থাকবে
-* screen-এর নিচে জায়গা না থাকলে প্রয়োজনে selected text-এর উপরে দেখানো যাবে
-* selected text-এর সাথে visually connected মনে হবে
-
-Example:
-
-```text
-This is Authentication in web security.
-
-             Authentication
-                  ↓
-             অথেন্টিকেশন
-```
-
----
-
-## Result Remove Rule
-
-Result permanent থাকবে না।
-
-যখন:
-
-* user selection remove করবে
-* অন্য text select করবে
-* page-এর অন্য জায়গায় click করবে
-* `Escape` চাপবে
-
-তখন pronunciation result remove করতে হবে।
-
-অর্থাৎ:
-
-```text
-Ctrl + Select
-      ↓
-Pronunciation দেখাবে
-      ↓
-Selection শেষ
-      ↓
-Result থাকবে
-
-Selection/Deselect
-      ↓
-Result চলে যাবে
-```
-
----
-
-## Ctrl Detection
-
-শুধু `selectionchange` event-এর উপর নির্ভর করা যাবে না।
-
-কারণ user mouse release করার আগে বা পরে Ctrl ছেড়ে দিতে পারে।
-
-তাই:
-
-```javascript
-let ctrlWasPressedDuringSelection = false;
-
-document.addEventListener("keydown", (event) => {
-    if (event.key === "Control") {
-        ctrlWasPressedDuringSelection = true;
-    }
-});
-
-document.addEventListener("keyup", (event) => {
-    if (event.key === "Control") {
-        // Selection চলমান থাকলে state immediately reset করা যাবে না
-    }
-});
-```
-
-Selection শেষ হওয়ার সময় verify করতে হবে যে selection তৈরির সময় Ctrl pressed ছিল।
-
-প্রয়োজনে `mousedown`, `mousemove`, `mouseup`, `keydown`, `keyup` state ব্যবহার করে reliable selection tracking তৈরি করতে হবে।
-
----
-
-## Selected Text
-
-Use:
-
-```javascript
-const selection = window.getSelection();
-const text = selection.toString().trim();
-```
-
-Empty selection হলে কোনো API request করা যাবে না।
-
-Maximum:
-
-```text
-500 characters
-```
-
-এর বেশি হলে request করা যাবে না।
-
----
-
-## Position
-
-Selected text-এর location:
-
-```javascript
-const range = selection.getRangeAt(0);
-const rect = range.getBoundingClientRect();
-```
-
-Result position:
-
-```javascript
-top = rect.bottom + window.scrollY + smallGap
-left = rect.left + window.scrollX
-```
-
-Viewport-এর বাইরে চলে গেলে position automatically adjust করতে হবে।
-
----
-
-## API Flow
-
-Extension সরাসরি Gemini API call করবে না।
-
-Architecture:
-
-```text
-Firefox Extension
-       ↓
-Own Backend API
-       ↓
-Gemini API
-       ↓
-Backend
-       ↓
-Firefox Extension
-       ↓
-Selected Text-এর নিচে Result
-```
-
-Backend endpoint:
-
-```http
-POST /api/pronunciation
-```
-
-Request:
-
-```json
-{
-  "text": "Authentication"
-}
-```
-
-Response:
-
-```json
-{
-  "pronunciation": "অথেন্টিকেশন"
-}
-```
-
----
-
-## Gemini Instruction
-
-Gemini-কে strictly বলতে হবে:
-
-```text
-Act as an English-to-Bengali phonetic pronunciation assistant.
-
-Convert the given English word or phrase into Bengali script based ONLY on how it is pronounced.
-
-Do NOT translate the meaning.
-
-Do NOT explain anything.
-
-Do NOT provide IPA.
-
-Do NOT return English text.
-
-Return ONLY the Bengali phonetic pronunciation.
-```
-
----
-
-## Important Browser Shortcut Rule
-
-Extension কোনো browser shortcut block করবে না।
-
-বিশেষ করে:
-
-```text
-Ctrl+C
-Ctrl+A
-Ctrl+F
-Ctrl+V
-Ctrl+Z
-Ctrl+X
-```
-
-এগুলোর জন্য `preventDefault()` ব্যবহার করা যাবে না।
-
-Extension-এর কাজ শুধু selected text detect করা।
-
----
-
-## Duplicate Request Prevention
-
-একই selection-এর জন্য multiple API request পাঠানো যাবে না।
-
-ব্যবহার করতে হবে:
-
-* 120ms debounce for faster response while avoiding duplicate selection requests
-* request lock
-* duplicate text detection
-
----
-
-## Cache
-
-আগে কোনো word/phrase-এর pronunciation পাওয়া থাকলে আবার API call না করে cache থেকে result দেখাতে হবে।
-
-Example:
-
-```text
-Authentication
-      ↓
-প্রথমবার → API → অথেন্টিকেশন → Cache
-
-দ্বিতীয়বার
-      ↓
-Cache → অথেন্টিকেশন
-```
-
-এতে API usage কমবে।
-
----
-
-## UI
-
-Result খুব simple হবে।
-
-শুধু:
-
-```text
-অথেন্টিকেশন
-```
-
-Selected text-এর নিচে দেখাবে।
-
-কোনো:
-
-* popup window
-* Copy button
-* Listen button
-* Close button
-* right-click menu
-
-থাকবে না।
-
----
-
-## Final User Experience
-
-```text
-User:
-
-Ctrl ধরে
-      ↓
-"Authentication" select করে
-      ↓
-Mouse release
-      ↓
-
-Authentication
-অথেন্টিকেশন
-
-      ↓
-
-User অন্য জায়গায় click/deselect করে
-      ↓
-
-অথেন্টিকেশন result disappear
-```
-
-মূল লক্ষ্য হলো **selection-এর সাথে temporary inline pronunciation result দেখানো**, আলাদা popup UI তৈরি না করা।
+## Selection behavior
+
+- Trigger only when Ctrl was held during mouse text selection.
+- Ordinary text selection must not request a pronunciation.
+- Do not rely only on `selectionchange`; track key and mouse state because Ctrl may be released before mouseup.
+- Do not block or modify browser shortcuts. In particular, never call `preventDefault()` for Ctrl+C, Ctrl+A, Ctrl+F, Ctrl+V, Ctrl+Z, or Ctrl+X.
+- Process a non-empty selection only. Trim surrounding whitespace and reject selections longer than 500 characters.
+- Require at least one English letter before requesting a pronunciation.
+- Debounce selection processing by 120 ms and prevent duplicate requests for the same active selection.
+
+## Result presentation
+
+- Show only the Bengali pronunciation in a small inline-looking badge associated with the selection; do not create a browser popup window.
+- Use `Range.getBoundingClientRect()` to locate the selected text.
+- Place the result below the selection when possible, otherwise above it. Keep the result within the viewport and visually connected to the selection.
+- Isolate the result styling from page styles with Shadow DOM.
+- Remove the result when the selection is cleared, a new ordinary selection is made, the user clicks elsewhere, or Escape is pressed.
+- If a result is dismissed while a request is pending, a late response must not restore the badge.
+- Do not add copy, listen, close, or context-menu controls.
+
+## API and pronunciation rules
+
+- The extension must not call Gemini directly. It sends requests through the configured backend.
+- Backend endpoint: `POST /api/pronunciation`.
+- Request body: `{ "text": "Authentication" }`.
+- Successful response includes a Bengali-script `pronunciation` string.
+- Empty text and text over 500 characters must be rejected without calling Gemini.
+- Instruct Gemini to return only Bengali phonetic pronunciation: no translation, explanation, IPA, or English text.
+- The Gemini API key belongs only on the backend, never in the extension package.
+- The local-development default may use `http://localhost:3000/api/pronunciation`; any public release must configure a public HTTPS backend.
+
+## Cache and request handling
+
+- Check the built-in pronunciation dictionary before making a backend request.
+- Cache successful results in the extension and backend to reduce repeat API requests.
+- Do not send duplicate requests for the same active selection.
+- A stale response must not replace or recreate a result for a newer/dismissed selection.
+- Provide a clear-cache action in settings.
+
+## Settings and health status
+
+- Provide backend URL configuration, a backend health check, a quick pronunciation test, and a clear-cache action in the toolbar UI.
+- Health status may report whether a Gemini key is configured, the model name, and backend cache size; it must not reveal the key itself.
+- Report offline, missing-key, and request errors in a readable way.
+
+## Privacy and deployment
+
+- Tell users that selected text (up to 500 characters) is sent to the configured backend and may be sent to Gemini on a cache miss.
+- Keep the backend API key secret in the backend host's environment configuration.
+- Before public production use, add request abuse controls and monitor usage so an unauthenticated public endpoint cannot freely consume the operator's Gemini quota.
+- Publish an accurate privacy policy describing the deployed service, data flow, retention, and operator contact.
+
+## Acceptance criteria
+
+1. Ctrl + selection of valid English text displays a Bengali phonetic result after the short debounce.
+2. Ordinary selection does not issue a request and dismisses any previous result.
+3. Clearing the selection or pressing Escape dismisses the result.
+4. A late response cannot recreate a dismissed result.
+5. Empty, non-English-only, and over-limit selections do not call the backend.
+6. Browser shortcuts continue to work.
+7. Cached dictionary/API results are reused.
+8. Public release packages point to an HTTPS backend and do not contain API keys or local environment files.

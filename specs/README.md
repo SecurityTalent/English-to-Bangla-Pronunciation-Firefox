@@ -6,4 +6,4 @@ Project changes are tracked under `specs/` before implementation. Each change fo
 - `plan.md`: design decisions and implementation sequence.
 - `tasks.md`: checklist updated as work progresses, including verification results.
 
-Keep the original Bengali requirements in `Requerment.md` as the product source of truth. Update the relevant spec and task status whenever behavior changes.
+Keep `Requerment.md` as the product-level requirements source. Update the relevant specification and task status whenever behavior changes.
