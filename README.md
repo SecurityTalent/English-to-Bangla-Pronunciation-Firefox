@@ -1,7 +1,8 @@
 <div align="center">
   <img src="icons/icon.svg" alt="English to Bangla Pronunciation icon" width="88" height="88" />
   <h1>English to Bangla Pronunciation</h1>
-  <p>A Firefox extension for instant Bengali-script pronunciations of selected English text.</p>
+  <p>A Firefox extension for Bengali-script pronunciations of selected English text.</p>
+  <p>A project by <a href="https://securitytalent.net">Security Talent</a>.</p>
 </div>
 
 ---
@@ -42,6 +43,17 @@ The extension sends requests to the configured backend. The backend handles dict
 - Firefox for extension testing
 - Node.js 18 or later
 - A Gemini API key for text not covered by the built-in dictionary
+
+### Get a Gemini API key
+
+1. Sign in to [Google AI Studio](https://aistudio.google.com/) with your Google account.
+2. Open the [API Keys page](https://aistudio.google.com/app/apikey).
+3. Select **Create API key** and follow the prompts to create or select a Google project.
+4. Copy the key into `GEMINI_API_KEY` in `backend/.env` for local development. For a hosted backend, add it as a secret environment variable in the hosting provider's dashboard.
+
+Google offers a free tier for eligible Gemini models and projects, subject to model availability, account eligibility, and usage/rate limits. Limits and pricing may change; check Google's [current Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing) before use. Google states that free-tier content may be used to improve its products, so do not send sensitive text through a free-tier key. See Google's [API key guidance](https://ai.google.dev/gemini-api/docs/api-key) and applicable terms for current security and data-use details.
+
+Never put the API key in `manifest.json`, extension JavaScript, or a public repository. Keep it on the backend only.
 
 ### Configure the backend
 
