@@ -9,3 +9,4 @@ Project changes are tracked under `specs/` before implementation. Each change fo
 Keep `Requerment.md` as the product-level requirements source. Update the relevant specification and task status whenever behavior changes.
 
 The Alt + selection meaning feature is tracked in `007-alt-selection-meaning/`.
+Production startup and deployment documentation is tracked in `008-production-docs/`.

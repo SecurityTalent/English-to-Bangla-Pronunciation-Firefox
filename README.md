@@ -90,6 +90,14 @@ npm run build   # Create versioned ZIP and XPI packages in dist/
 
 The smoke test uses port 3000. Stop the backend before running `npm test`.
 
+Only start one backend process for a given port. If startup reports `EADDRINUSE`, a backend is already listening on that port; reuse it, or stop the existing process before starting another. To identify the process in PowerShell:
+
+```powershell
+Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object LocalAddress, LocalPort, OwningProcess
+```
+
+If another service needs port 3000, change `PORT` in `backend/.env` and update the extension backend URL to match.
+
 ### Load the extension in Firefox
 
 1. Open `about:debugging#/runtime/this-firefox`.
@@ -135,9 +143,16 @@ For a Render Web Service, configure:
 | Start Command | `npm start` |
 | Environment variables | `GEMINI_API_KEY`, `GEMINI_MODEL` |
 
-After deployment, set `DEFAULT_SETTINGS.backendUrl` in `background.js` to the public HTTPS endpoint, increment the version in `manifest.json`, build a new package, and verify both the health and pronunciation endpoints.
+For a production release:
 
-**Production security:** the backend currently has no authentication or rate limiting. Add request abuse controls and usage monitoring before exposing it publicly; otherwise, other people may consume the operator's Gemini quota.
+1. Connect the GitHub repository's `main` branch to the hosting provider and deploy the `backend` directory as a web service.
+2. Configure `GEMINI_API_KEY` and `GEMINI_MODEL` as private service environment variables. Do not commit `.env` or the API key.
+3. Check `https://<your-service-domain>/api/health`; confirm the service is online and `hasApiKey` is true.
+4. Set `DEFAULT_SETTINGS.backendUrl` in `background.js` to `https://<your-service-domain>/api/pronunciation`. The extension derives `/api/meaning` and `/api/health` from this URL.
+5. Increment the extension version in `manifest.json`, run `npm run build`, then load the ZIP in Firefox and verify both Ctrl pronunciation and Alt meaning lookups against the deployed HTTPS service.
+6. Submit the ZIP to AMO and publish a privacy policy that describes the actual deployed service.
+
+Do not describe the extension as production-ready until these steps are complete. This backend currently has no authentication or rate limiting; add request abuse controls and usage monitoring before making a public service available, or others may consume the operator's Gemini quota.
 
 Render Free services sleep after inactivity and may take about a minute to wake. Render describes its free instances as suitable for hobby projects and testing, not production use. Review [Render's current limits](https://render.com/docs/free) and select production-suitable hosting for a public release.
 
@@ -180,7 +195,8 @@ This project follows a lightweight Spec-Driven Development workflow. Change reco
 
 ## Troubleshooting
 
-- **Backend offline:** run `npm start` from the project root for local development. Published builds need a reachable HTTPS backend, not `localhost`.
+- **Backend offline:** run `npm install --prefix backend` once, then `npm start` from the project root for local development. Published builds need a reachable HTTPS backend, not `localhost`.
+- **`EADDRINUSE` on port 3000:** another backend process is already running. Use that server or stop it before running `npm start` again. Configure a different `PORT` if needed.
 - **Gemini API key required:** set `GEMINI_API_KEY` in the local `backend/.env` or the hosting provider's environment configuration, then restart the backend.
 - **No result appears:** hold Ctrl for pronunciation or Alt for meaning while selecting English text of 500 characters or fewer. Common pronunciation dictionary entries can work without a Gemini key; generated meanings require a configured key.
 - **A previous backend is still running:** stop it before running `npm test`, because the smoke test uses port 3000.
