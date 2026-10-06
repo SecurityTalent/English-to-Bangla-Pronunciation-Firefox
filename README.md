@@ -1,90 +1,91 @@
-# English to Bangla Pronunciation for Firefox
+<div align="center">
+  <img src="icons/icon-128.png" alt="English to Bangla Pronunciation icon" width="88" height="88" />
+  <h1>English to Bangla Pronunciation</h1>
+  <p>A Firefox extension for instant Bengali-script pronunciations of selected English text.</p>
+</div>
 
-A Firefox extension that displays the Bengali phonetic pronunciation of English text selected while holding **Ctrl**. It provides pronunciation in Bengali script; it does not translate meaning.
+---
+
+## Overview
+
+Hold **Ctrl** while selecting English text to see its phonetic pronunciation in Bengali near the selection. The extension transliterates pronunciation; it does not translate meaning.
+
+```text
+Authentication
+      ↓
+অথেন্টিকেশন
+```
 
 ## Features
 
-- Trigger pronunciation with Ctrl + text selection.
-- Display a temporary result next to the selection, positioning it above when there is not enough room below.
-- Dismiss the result when the selection is cleared, a normal selection is made, or Escape is pressed.
-- Preserve browser shortcuts such as Ctrl+C, Ctrl+A, Ctrl+F, Ctrl+V, Ctrl+Z, and Ctrl+X.
-- Debounce selection handling by 120 ms and avoid duplicate requests.
-- Reuse cached results and provide a built-in dictionary for common terms.
-- Isolate result styling from the page with Shadow DOM.
+| Feature | Details |
+| --- | --- |
+| Ctrl + select | Requests a pronunciation only for Ctrl-assisted selections. |
+| Inline result | Places a temporary badge near the selected text and adjusts its position to fit the viewport. |
+| Quick dismissal | Removes the badge when the selection is cleared, a normal selection is made, or Escape is pressed. |
+| Built-in dictionary | Returns common pronunciation entries without a Gemini request. |
+| Caching | Reuses previous results to reduce repeat requests. |
+| Browser shortcuts | Leaves Ctrl+C, Ctrl+A, Ctrl+F, Ctrl+V, Ctrl+Z, and Ctrl+X available to Firefox. |
 
 ## How it works
 
 ```text
-Firefox content script
-        ↓ runtime message
-Firefox background script
-        ↓ POST /api/pronunciation
-Node.js / Express backend
-        ↓ on cache miss
-Google Gemini API
+Firefox content script → background script → pronunciation backend → Gemini API
 ```
 
-The extension does not call Gemini directly. The Gemini API key is configured on the backend and must never be placed in the extension package.
+The extension sends requests to the configured backend. The backend handles dictionary lookups, caching, and Gemini API calls. The Gemini API key stays on the backend and is never included in the extension package.
 
-## Project structure
+## Get started
 
-```text
-backend/                 Express API, pronunciation dictionary, and smoke test
-icons/                   Extension icons
-specs/                   Spec-Driven Development records
-background.js            Settings, cache, and backend requests
-content.js               Selection tracking and pronunciation badge
-manifest.json            Firefox Manifest V3 configuration
-options.html / options.js Settings, health check, and quick test UI
-build_extension.js       ZIP/XPI packaging script
-PRIVACY.md               Privacy policy draft
-Requerment.md            Product requirements
-```
+### Requirements
 
-## Requirements
-
-- Node.js 18 or newer
 - Firefox for extension testing
-- A Gemini API key for text that is not covered by the built-in dictionary
+- Node.js 18 or later
+- A Gemini API key for text not covered by the built-in dictionary
 
-## Local setup
+### Configure the backend
 
-From the project root, install the backend dependencies and create a local environment file:
+Run these commands from the project root in PowerShell:
 
 ```powershell
 npm --prefix backend install
 Copy-Item backend/.env.example backend/.env
 ```
 
-If `backend/.env` already exists, keep it and edit it instead of copying the template again. Set the API key and model in that file:
+If `backend/.env` already exists, keep it and update it instead of copying the template. Add your key:
 
 ```env
-GEMINI_API_KEY=your_real_key_here
+GEMINI_API_KEY=your_api_key
 PORT=3000
 GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-Keep `backend/.env` private. The repository ignores environment files, dependencies, and generated ZIP/XPI packages.
+Keep `.env` private. Environment files, `node_modules`, and generated ZIP/XPI packages are excluded by `.gitignore`.
 
-Available root commands:
+Start the local backend:
 
 ```powershell
-npm start       # Start the backend at http://localhost:3000
-npm test        # Run the backend dictionary smoke checks
-npm run build   # Create versioned ZIP and XPI files under dist/
+npm start
 ```
 
-The backend smoke test uses port 3000. Stop any running backend before starting the test.
+The API is available at `http://localhost:3000`. Other root commands:
 
-## Test the extension in Firefox
+```powershell
+npm test        # Backend dictionary smoke checks
+npm run build   # Create versioned ZIP and XPI packages in dist/
+```
 
-1. Open `about:debugging#/runtime/this-firefox` in Firefox.
+The smoke test uses port 3000. Stop the backend before running `npm test`.
+
+### Load the extension in Firefox
+
+1. Open `about:debugging#/runtime/this-firefox`.
 2. Select **Load Temporary Add-on...**.
-3. Choose the project's `manifest.json` file.
+3. Choose the project's `manifest.json`.
 4. Open `test_demo.html`, hold Ctrl, and select an English word such as “Authentication”.
-5. Release the mouse to see the pronunciation. Press Escape or clear the selection to dismiss it.
+5. Release the mouse to see the Bengali pronunciation. Press Escape or clear the selection to dismiss it.
 
-Temporary add-ons are removed when Firefox restarts. Use an AMO-signed version for a persistent installation.
+Temporary add-ons are removed when Firefox restarts. Use an AMO-signed build for a persistent installation.
 
 ## Backend API
 
@@ -102,50 +103,67 @@ Successful response:
 { "pronunciation": "অথেন্টিকেশন", "source": "cache" }
 ```
 
-The endpoint rejects empty text and input longer than 500 characters. `GET /api/health` reports service status, the configured model, whether an API key is configured, and the in-memory cache size. It never returns the key itself.
+The endpoint accepts up to 500 characters and rejects empty input. `GET /api/health` reports the service status, configured model, whether an API key is present, and the in-memory cache size. It does not return the API key.
 
 ## Production deployment
 
-The development default is `http://localhost:3000/api/pronunciation`; it only works on the computer running the backend. A public extension release requires a reachable HTTPS backend.
+The default backend address, `http://localhost:3000`, is for local development only. A public extension needs a publicly reachable **HTTPS** backend.
 
-For a Render Web Service, connect the source repository and set:
+For a Render Web Service, configure:
 
-- **Root Directory:** `backend`
-- **Build Command:** `npm install`
-- **Start Command:** `npm start`
-- **Environment variables:** `GEMINI_API_KEY`, `GEMINI_MODEL`
+| Setting | Value |
+| --- | --- |
+| Root Directory | `backend` |
+| Build Command | `npm install` |
+| Start Command | `npm start` |
+| Environment variables | `GEMINI_API_KEY`, `GEMINI_MODEL` |
 
-After deployment, update `DEFAULT_SETTINGS.backendUrl` in `background.js` to the public HTTPS endpoint, increment the version in `manifest.json`, and build a new package. Test the deployed health and pronunciation endpoints before submitting the extension.
+After deployment, set `DEFAULT_SETTINGS.backendUrl` in `background.js` to the public HTTPS endpoint, increment the version in `manifest.json`, build a new package, and verify both the health and pronunciation endpoints.
 
-Do not use Render Free for a production release: free services sleep after inactivity and can take about a minute to wake. Render describes its Free instances as suitable for hobby projects and testing, not production applications. Review [Render's current free-plan limits](https://render.com/docs/free) or use production-suitable hosting.
+**Production security:** the backend currently has no authentication or rate limiting. Add request abuse controls and usage monitoring before exposing it publicly; otherwise, other people may consume the operator's Gemini quota.
 
-The backend currently has no authentication or rate limiting. Add abuse controls and usage monitoring before exposing it publicly; otherwise, others may consume the backend operator's Gemini quota.
+Render Free services sleep after inactivity and may take about a minute to wake. Render describes its free instances as suitable for hobby projects and testing, not production use. Review [Render's current limits](https://render.com/docs/free) and select production-suitable hosting for a public release.
 
 ## Privacy
 
-When the user selects text with Ctrl, the extension sends the selected text (up to 500 characters) to the configured backend. On a cache miss, the backend sends the text to Gemini. Pronunciations and the configured backend URL are cached in Firefox extension storage; the backend also keeps a temporary in-memory cache.
+When a user selects text while holding Ctrl, the extension sends that text (up to 500 characters) to the configured backend. On a cache miss, the backend sends it to Gemini. Pronunciations and the backend URL are stored in Firefox extension storage; the backend also keeps a temporary in-memory cache.
 
-Before publication, verify the deployed service's data handling, replace the contact placeholder in [PRIVACY.md](PRIVACY.md), and publish the policy at a public URL. The AMO listing must accurately describe the text transfer and any retention by the hosting provider or API provider.
+Before publication, verify the deployed service's actual data handling, replace the contact placeholder in [PRIVACY.md](PRIVACY.md), and publish the policy at a public URL. Disclose the text transfer and any provider retention in the AMO listing.
 
-## Build and publish to AMO
+## Build and publish
 
-Build the package from the project root:
+Build release packages from the project root:
 
 ```powershell
 npm run build
 ```
 
-The script creates versioned `.zip` and `.xpi` files in `dist/`. Upload the ZIP through the [AMO Developer Hub](https://addons.mozilla.org/developers/), choose **Submit a New Add-on** and **On this site**, then review the validator results and complete the listing and privacy information. Fix validation errors before submission. Mozilla's [submission guide](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) has the current steps.
+The script creates versioned `.zip` and `.xpi` files under `dist/`. Upload the ZIP through the [AMO Developer Hub](https://addons.mozilla.org/developers/), select **Submit a New Add-on** and **On this site**, then review the validator results and complete the listing and privacy details. Fix validation errors before submitting. See Mozilla's [submission guide](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/).
 
-AMO validation and review are not guaranteed. The generated packages are excluded from GitHub; build them locally or attach them to a GitHub Release.
+AMO validation and review are not guaranteed. Build packages locally or attach them to a GitHub Release; generated packages are intentionally excluded from the source repository.
 
-## Spec-Driven Development
+## Project structure
 
-Specifications, implementation plans, and task tracking are maintained under `specs/`. Keep `Requerment.md` as the product-level requirements source and update the relevant task list as implementation changes.
+```text
+backend/                 Express API, built-in dictionary, and smoke test
+icons/                   Extension icons
+specs/                   Specifications, plans, and task tracking
+background.js            Settings, cache, and backend requests
+content.js               Selection tracking and pronunciation badge
+manifest.json            Firefox Manifest V3 configuration
+options.html / options.js Settings, health check, and quick test UI
+build_extension.js       ZIP/XPI packaging script
+PRIVACY.md               Privacy policy draft
+Requerment.md            Product requirements
+```
+
+## Development workflow
+
+This project follows a lightweight Spec-Driven Development workflow. Change records live under `specs/` and use `spec.md` for requirements, `plan.md` for the implementation approach, and `tasks.md` for progress and verification. Keep `Requerment.md` as the product-level requirements source.
 
 ## Troubleshooting
 
-- **Backend offline:** run `npm start` from the project root for local development. A published extension needs a reachable HTTPS backend rather than `localhost`.
-- **API key required:** set a valid `GEMINI_API_KEY` in `backend/.env` locally or in the hosting provider's environment settings, then restart the backend.
-- **No result:** select English text of 500 characters or fewer while holding Ctrl. Common built-in dictionary entries can work without the Gemini API key.
-- **Browser shortcuts:** the extension does not cancel shortcuts; Ctrl+C, Ctrl+V, and Ctrl+A should work normally.
+- **Backend offline:** run `npm start` from the project root for local development. Published builds need a reachable HTTPS backend, not `localhost`.
+- **Gemini API key required:** set `GEMINI_API_KEY` in the local `backend/.env` or the hosting provider's environment configuration, then restart the backend.
+- **No pronunciation appears:** hold Ctrl during selection and select English text of 500 characters or fewer. Common dictionary entries can work without a Gemini key.
+- **A previous backend is still running:** stop it before running `npm test`, because the smoke test uses port 3000.
