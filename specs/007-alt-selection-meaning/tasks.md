@@ -6,4 +6,4 @@
 - [x] Preserve the pronunciation dictionary and Ctrl behavior.
 - [x] Update product requirements and README instructions.
 - [x] Run JavaScript syntax checks, diff whitespace check, and build the release ZIP/XPI package.
-- [ ] Commit and push the completed feature.
+- [x] Commit and push the completed feature (`ef62ba5`).
