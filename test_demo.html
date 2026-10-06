@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bangla Phonetic Pronunciation - Extension Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.7;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+
+    h1 {
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
+
+    .instructions {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 30px;
+    }
+
+    .instructions h2 {
+      margin-top: 0;
+      color: #1e40af;
+      font-size: 18px;
+    }
+
+    .instructions kbd {
+      background: #1e293b;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    .test-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .test-card h3 {
+      margin-top: 0;
+      color: #334155;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sample-text {
+      font-size: 20px;
+      font-weight: 500;
+      padding: 14px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      margin: 12px 0;
+      user-select: text;
+    }
+
+    .expected {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .expected span {
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .shortcut-test {
+      background: #fefce8;
+      border-left: 4px solid #eab308;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      color: #713f12;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧪 Bangla Phonetic Pronunciation — Firefox Test Page</h1>
+
+  <div class="instructions">
+    <h2>🎯 How to test:</h2>
+    <ol>
+      <li>Hold down the <kbd>Ctrl</kbd> key on your keyboard.</li>
+      <li>Select any English word or phrase below with your mouse.</li>
+      <li>Release the mouse button — you will see the Bengali phonetic pronunciation appear right below your selection!</li>
+      <li>Click anywhere else on the page or press <kbd>Esc</kbd> to dismiss the pronunciation.</li>
+      <li><strong>Note:</strong> Normal selection (without holding <kbd>Ctrl</kbd>) will NOT trigger any pronunciation popup.</li>
+    </ol>
+  </div>
+
+  <div class="test-card">
+    <h3>Test 1: Single Security Terms</h3>
+    <p>Hold <kbd>Ctrl</kbd> and select:</p>
+    <div class="sample-text">Authentication</div>
+    <div class="expected">Expected Bengali Pronunciation: <span>অথেন্টিকেশন</span></div>
+  </div>
+
+  <div class="test-card">
+    <h3>Test 2: Vulnerability Analysis</h3>
+    <p>Hold <kbd>Ctrl</kbd> and select:</p>
+    <div class="sample-text">Vulnerability</div>
+    <div class="expected">Expected Bengali Pronunciation: <span>ভালনারেবিলিটি</span></div>
+  </div>
+
+  <div class="test-card">
+    <h3>Test 3: Compound Technical Phrases</h3>
+    <p>Hold <kbd>Ctrl</kbd> and select:</p>
+    <div class="sample-text">Prototype Pollution</div>
+    <div class="expected">Expected Bengali Pronunciation: <span>প্রোটোটাইপ পলিউশন</span></div>
+  </div>
+
+  <div class="test-card">
+    <h3>Test 4: In-line Sentence Selection</h3>
+    <p>Hold <kbd>Ctrl</kbd> and select any word inside this paragraph:</p>
+    <div class="sample-text" style="font-size: 17px; font-weight: 400; line-height: 1.8;">
+      This is Authentication in web security. Modern web application development requires robust encryption, secure authorization, and resilient cloud architecture.
+    </div>
+  </div>
+
+  <div class="shortcut-test">
+    <strong>Browser Shortcut Check:</strong><br>
+    Select any text and press <kbd>Ctrl + C</kbd> to copy, then paste with <kbd>Ctrl + V</kbd>. The extension does NOT interfere with browser copy, paste, or select-all shortcuts.
+  </div>
+
+</body>
+</html>

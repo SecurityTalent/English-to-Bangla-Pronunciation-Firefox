@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#db2777" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bgGrad)" filter="url(#shadow)" />
+
+  <!-- Inner subtle border -->
+  <rect x="9" y="9" width="110" height="110" rx="27" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2" />
+
+  <!-- Letters: English 'A' on top left, Arrow, Bengali 'অ' on bottom right -->
+  <!-- Letter A -->
+  <text x="32" y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="800" fill="#ffffff" text-anchor="middle">A</text>
+
+  <!-- Arrow -->
+  <path d="M 52 46 L 76 46 M 70 40 L 76 46 L 70 52" fill="none" stroke="#facc15" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Bengali letter অ -->
+  <text x="74" y="98" font-family="'Kalpurush', 'SolaimanLipi', 'Nirmala UI', sans-serif" font-size="44" font-weight="bold" fill="#ffffff" text-anchor="middle">অ</text>
+
+  <!-- Small sound waves / phonetic indicator -->
+  <path d="M 96 74 C 99 79 99 87 96 92" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round" />
+  <path d="M 103 69 C 108 76 108 90 103 97" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round" opacity="0.7" />
+</svg>

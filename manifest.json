@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Bangla Phonetic Pronunciation",
+  "version": "1.0.1",
+  "description": "Ctrl ধরে English text select করলে ঠিক নিচে বাংলা phonetic pronunciation দেখায়।",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "bangla-pronunciation@firefox.extension",
+      "strict_min_version": "109.0"
+    }
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "Bangla Phonetic Pronunciation",
+    "default_popup": "options.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}
