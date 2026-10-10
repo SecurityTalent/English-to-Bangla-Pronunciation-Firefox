@@ -22,6 +22,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Staging
+dist/
 dist/extension/
 *.zip
 *.xpi

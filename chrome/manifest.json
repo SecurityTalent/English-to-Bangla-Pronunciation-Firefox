@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Bangla Phonetic Pronunciation",
+  "version": "1.0.2",
+  "description": "Ctrl দিয়ে English pronunciation এবং Alt দিয়ে বাংলা অর্থ দেখুন।",
+  "permissions": ["storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_title": "Bangla Phonetic Pronunciation",
+    "default_popup": "options.html"
+  },
+  "options_page": "options.html"
+}

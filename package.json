@@ -2,7 +2,7 @@
   "name": "bangla-phonetic-pronunciation",
   "version": "1.0.0",
   "private": true,
-  "description": "Firefox extension and pronunciation backend",
+  "description": "Firefox and Chrome extensions with pronunciation backend",
   "scripts": {
     "start": "npm --prefix backend start",
     "dev": "npm --prefix backend run dev",

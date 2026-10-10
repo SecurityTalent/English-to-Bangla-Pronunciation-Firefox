@@ -1,7 +1,7 @@
 <div align="center">
   <img src="icons/icon.svg" alt="English to Bangla Pronunciation icon" width="88" height="88" />
   <h1>English to Bangla Pronunciation</h1>
-  <p>A Firefox extension for Bengali-script pronunciations and meanings of selected English text.</p>
+  <p>A Firefox and Chrome extension for Bengali-script pronunciations and meanings of selected English text.</p>
   <p>A project by <a href="https://securitytalent.net">Security Talent</a>.</p>
 </div>
 
@@ -41,7 +41,7 @@ The extension sends requests to the configured backend. The backend handles dict
 
 ### Requirements
 
-- Firefox for extension testing
+- Firefox or Google Chrome for extension testing
 - Node.js 18 or later
 - A Gemini API key for text not covered by the built-in dictionary
 
@@ -108,6 +108,15 @@ If another service needs port 3000, change `PORT` in `backend/.env` and update t
 
 Temporary add-ons are removed when Firefox restarts. Use an AMO-signed build for a persistent installation.
 
+### Load the extension in Chrome
+
+1. Run `npm run build` from the project root.
+2. Open `chrome://extensions` and enable **Developer mode**.
+3. Select **Load unpacked** and choose `dist/chrome-unpacked`.
+4. Open `test_demo.html` and try Ctrl + select for pronunciation and Alt + select for Bengali meaning.
+
+Chrome Web Store submissions use the Chrome ZIP package. Review the requested host access carefully during store submission.
+
 ## Backend API
 
 ### `POST /api/pronunciation`
@@ -170,7 +179,7 @@ Build release packages from the project root:
 npm run build
 ```
 
-The script creates versioned `.zip` and `.xpi` files under `dist/`. Upload the ZIP through the [AMO Developer Hub](https://addons.mozilla.org/developers/), select **Submit a New Add-on** and **On this site**, then review the validator results and complete the listing and privacy details. Fix validation errors before submitting. See Mozilla's [submission guide](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/).
+The script creates a Firefox ZIP, Firefox XPI, and Chrome ZIP under `dist/`. Upload the Firefox ZIP through the [AMO Developer Hub](https://addons.mozilla.org/developers/) and the Chrome ZIP through the Chrome Web Store developer dashboard. Review each store's validator results, permissions, listing, and privacy details before release.
 
 AMO validation and review are not guaranteed. Build packages locally or attach them to a GitHub Release; generated packages are intentionally excluded from the source repository.
 
@@ -178,11 +187,13 @@ AMO validation and review are not guaranteed. Build packages locally or attach t
 
 ```text
 backend/                 Express API, built-in dictionary, and smoke test
+chrome/                  Chrome Manifest V3 configuration
 icons/                   Extension's scalable vector icon
 specs/                   Specifications, plans, and task tracking
 background.js            Settings, cache, and backend requests
 content.js               Selection tracking and pronunciation badge
 manifest.json            Firefox Manifest V3 configuration
+chrome/manifest.json     Chrome Manifest V3 service worker configuration
 options.html / options.js Settings, health check, and quick test UI
 build_extension.js       ZIP/XPI packaging script
 PRIVACY.md               Privacy policy draft
