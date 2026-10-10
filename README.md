@@ -5,7 +5,7 @@
 Select English text to see its Bengali pronunciation or meaning in Chrome or Firefox.
 
 [![Download Chrome](https://img.shields.io/badge/Download-Chrome%20package-4285F4?logo=googlechrome&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-chrome-v1.0.8.zip)
-[![Download Firefox](https://img.shields.io/badge/Download-Firefox%20package-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.4.zip)
+[![Download Firefox](https://img.shields.io/badge/Download-Firefox%20package-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.5.zip)
 
 <br>
 
@@ -42,6 +42,8 @@ The public API limits each client IP to **60 pronunciation/meaning requests per 
 4. If an older copy is installed, reload or remove it before loading the new folder.
 
 **Firefox**
+
+Firefox 140 or newer is required. Firefox displays its built-in data consent prompt because selected webpage text is sent to the backend for the requested pronunciation or meaning.
 
 1. Open `about:debugging#/runtime/this-firefox`.
 2. Click **Load Temporary Add-on...** and select `manifest.json` inside the extracted Firefox package folder.
