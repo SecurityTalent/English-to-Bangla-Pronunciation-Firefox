@@ -122,6 +122,10 @@ Return ONLY the Bengali phonetic pronunciation.`;
   const uniqueModels = [...new Set(modelsToTry.filter(Boolean))];
 
   let lastError = null;
+  // Bound the complete model fallback sequence; otherwise a stalled provider can
+  // leave the extension loading for much longer than its request timeout.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   for (const model of uniqueModels) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
@@ -164,6 +168,7 @@ Return ONLY the Bengali phonetic pronunciation.`;
           "Content-Type": "application/json",
           "x-goog-api-key": GEMINI_API_KEY
         },
+        signal: controller.signal,
         body: JSON.stringify(requestBody)
       });
 
@@ -195,6 +200,7 @@ Return ONLY the Bengali phonetic pronunciation.`;
           .trim();
 
         if (cleaned.length > 0) {
+          clearTimeout(timeoutId);
           return cleaned;
         }
       }
@@ -208,6 +214,7 @@ Return ONLY the Bengali phonetic pronunciation.`;
     }
   }
 
+  clearTimeout(timeoutId);
   throw lastError || new Error("Failed to contact Gemini API");
 }
 

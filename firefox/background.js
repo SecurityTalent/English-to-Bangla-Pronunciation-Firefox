@@ -200,10 +200,10 @@ async function fetchPronunciation(text) {
     }
   }
 
-  // 4. Request Backend API with 25-second timeout (prevents premature timeouts)
+  // Keep failed backend requests bounded so the badge cannot appear to load forever.
   const backendUrl = settings.backendUrl;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
 
   try {
     const response = await fetch(backendUrl, {
@@ -215,9 +215,8 @@ async function fetchPronunciation(text) {
       signal: controller.signal
     });
 
-    clearTimeout(timeoutId);
-
     const data = await response.json();
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return {
@@ -257,7 +256,7 @@ async function fetchPronunciation(text) {
     if (err.name === "AbortError") {
       return {
         success: false,
-        error: "Backend request timed out (25s). Please check your internet connection."
+        error: "Backend request timed out (12s). Please check your internet connection."
       };
     }
 
@@ -283,7 +282,7 @@ async function fetchMeaning(text) {
 
   const backendUrl = settings.backendUrl.replace(/\/api\/pronunciation\/?$/, "/api/meaning");
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
   try {
     const response = await fetch(backendUrl, {
       method: "POST",
@@ -291,8 +290,8 @@ async function fetchMeaning(text) {
       body: JSON.stringify({ text }),
       signal: controller.signal
     });
-    clearTimeout(timeoutId);
     const data = await response.json();
+    clearTimeout(timeoutId);
     if (!response.ok) return { success: false, error: data.error || `Server responded with HTTP ${response.status}`, needsApiKey: data.needsApiKey || false };
     if (!data?.meaning) return { success: false, error: "No meaning returned by server." };
     if (settings.cacheEnabled) {
@@ -302,7 +301,7 @@ async function fetchMeaning(text) {
   } catch (err) {
     clearTimeout(timeoutId);
     return err.name === "AbortError"
-      ? { success: false, error: "Backend request timed out (25s)." }
+      ? { success: false, error: "Backend request timed out (12s)." }
       : { success: false, error: "Cannot connect to backend server.", unreachable: true };
   }
 }

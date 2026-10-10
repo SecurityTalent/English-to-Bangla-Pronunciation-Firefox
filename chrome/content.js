@@ -382,6 +382,12 @@
             return;
           }
 
+          const messageError = chrome.runtime.lastError;
+          if (messageError) {
+            showBadge(freshRect, "warning", "⚠️ Extension request failed. Reload this page and try again.");
+            return;
+          }
+
           const result = mode === "meaning" ? response?.meaning : response?.pronunciation;
           if (response && response.success && result) {
             localCache.set(cacheKey, result);
@@ -406,6 +412,10 @@
       );
     } catch (err) {
       console.warn("[BPP Content] Message error:", err);
+      const freshRect = getSelectionRect();
+      if (freshRect && requestId === currentRequestId) {
+        showBadge(freshRect, "warning", "⚠️ Extension request failed. Reload this page and try again.");
+      }
     }
   }
 
