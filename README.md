@@ -11,12 +11,28 @@ Chrome and Firefox extensions that show Bengali-script pronunciations and meanin
 
 Both extensions request access to all websites so their content scripts can detect selected text. Selected text is sent to the configured backend only when a lookup is triggered with Ctrl or Alt; see [PRIVACY.md](PRIVACY.md) for the data flow.
 
+## Quick start
+
+1. [Get a Gemini API key](#get-a-gemini-api-key).
+2. [Set up and start the backend](#set-up-the-backend).
+3. Run `npm.cmd run build`.
+4. Load `dist/chrome-unpacked` in Chrome or `dist/firefox-unpacked/manifest.json` in Firefox.
+
 ## Requirements
 
 - Windows PowerShell commands below use `npm.cmd`. On macOS/Linux, use `npm` in the same commands.
 - Node.js 18 or later for the backend.
 - Chrome 91 or later, or Firefox 109 or later.
 - A Gemini API key for meaning lookups and pronunciation text not covered by the built-in dictionary.
+
+## Get a Gemini API key
+
+1. Sign in to [Google AI Studio](https://aistudio.google.com/).
+2. Open [API Keys](https://aistudio.google.com/apikey). A new account may already have a default project and key; otherwise choose **Create API key** and follow the prompts to select or create a Google Cloud project. If your existing project is missing, import it from AI Studio's **Dashboard → Projects** page first.
+3. Copy the key and keep it private. Google's [Gemini API key guide](https://ai.google.dev/gemini-api/docs/api-key) explains project access, key types, restrictions, and current requirements.
+4. Add the key to `GEMINI_API_KEY` in `backend/.env` as described below. Never paste it into `chrome/`, `firefox/`, or a public GitHub repository.
+
+API availability, quotas, and charges depend on your Google project and current terms. Check Google's [current Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing) and limits before use; don't assume a key is unrestricted or free.
 
 ## Project layout
 

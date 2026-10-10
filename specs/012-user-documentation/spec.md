@@ -7,6 +7,7 @@ The project now ships separate Chrome and Firefox extensions, but the README did
 ## Requirements
 
 - Explain prerequisites and safely create/configure the backend environment file.
+- Explain where to create/find the Gemini API key and how to keep it server-side.
 - Document separate Chrome and Firefox source directories, minimum browser versions, and load-unpacked development steps.
 - List exact build outputs and explain which package goes to each store.
 - Document backend URL settings, API routes, local testing, and common startup errors.
