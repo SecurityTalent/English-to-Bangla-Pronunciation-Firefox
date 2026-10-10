@@ -1,6 +1,6 @@
 # Tasks
 
-- [x] Review setup, backend, privacy, production, and AMO instructions.
+- [x] Review setup, backend, privacy, production, and browser store instructions.
 - [x] Rewrite README in a concise professional style.
 - [x] Remove repository-name recommendation text.
 - [x] Refine the visual hierarchy and wording based on user feedback.

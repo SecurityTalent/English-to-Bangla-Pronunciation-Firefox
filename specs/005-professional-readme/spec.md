@@ -6,7 +6,7 @@ Implemented
 
 ## Requirements
 
-- Present the extension, setup, architecture, privacy, backend deployment, and AMO release process in concise professional English.
+- Present both browser extensions, setup, architecture, privacy, backend deployment, and separate store release processes in clear English.
 - Keep operational instructions consistent with current scripts and project behavior.
 - Do not include repository-name recommendations in the README.
 - State production limitations honestly.

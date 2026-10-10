@@ -26,7 +26,7 @@ Prototype Pollution   → প্রোটোটাইপ পলিউশন
 
 ## Result presentation
 
-- Show only the Bengali pronunciation in a small inline-looking badge associated with the selection; do not create a browser popup window.
+- Show the Bengali pronunciation or meaning in a small badge associated with the selection; do not create a browser popup window.
 - Use `Range.getBoundingClientRect()` to locate the selected text.
 - Place the result below the selection when possible, otherwise above it. Keep the result within the viewport and visually connected to the selection.
 - Isolate the result styling from page styles with Shadow DOM.
@@ -40,7 +40,7 @@ Prototype Pollution   → প্রোটোটাইপ পলিউশন
 - Backend endpoint: `POST /api/pronunciation`.
 - Meaning endpoint: `POST /api/meaning`; return a concise Bengali translation, not a phonetic transliteration.
 - Request body: `{ "text": "Authentication" }`.
-- Successful response includes a Bengali-script `pronunciation` string.
+- Successful pronunciation responses include a Bengali-script `pronunciation` string; meaning responses include a Bengali `meaning` string.
 - Empty text and text over 500 characters must be rejected without calling Gemini.
 - Instruct Gemini to return only Bengali phonetic pronunciation for pronunciation requests and concise Bengali meaning for meaning requests.
 - The Gemini API key belongs only on the backend, never in the extension package.
@@ -79,3 +79,4 @@ Prototype Pollution   → প্রোটোটাইপ পলিউশন
 7. Browser shortcuts continue to work.
 8. Pronunciation and meaning caches are independent; cached results are reused only for the matching mode.
 9. Public release packages point to an HTTPS backend and do not contain API keys or local environment files.
+10. Chrome and Firefox source and release packages remain separate and independently loadable.

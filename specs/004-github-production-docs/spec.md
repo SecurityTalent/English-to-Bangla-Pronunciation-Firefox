@@ -9,8 +9,8 @@ Documentation updated; application still needs public-backend hardening before p
 - Document root-level installation, start, test, and build commands accurately.
 - Never instruct contributors to publish the Gemini key or local `.env` file.
 - Explain that the deployed extension requires a reachable HTTPS backend.
-- Document actual data flow and AMO privacy-policy requirements.
-- Describe AMO validation as a required step without guaranteeing results.
+- Document actual data flow and store privacy-policy requirements for Chrome and Firefox.
+- Describe Chrome Web Store and Mozilla Add-ons validation as required steps without guaranteeing results.
 - Ignore generated ZIP/XPI packages in the source repository.
 
 ## Acceptance criteria

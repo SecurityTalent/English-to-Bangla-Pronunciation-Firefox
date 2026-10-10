@@ -1,8 +1,12 @@
 # Separate Chrome and Firefox Implementations
 
+## Status
+
+Implemented on `main`; both source directories and separate build outputs are available.
+
 ## Problem
 
-The user wants both browser extensions, with each browser's code maintained and packaged separately. The Chrome-only branch cleanup removed the Firefox source tree, so the two deliverables are not currently both available from this branch.
+The user wants both browser extensions, with each browser's code maintained and packaged separately. During implementation, a Chrome-only branch cleanup temporarily removed the Firefox source tree, so the Firefox source was restored in its own directory.
 
 ## Requirements
 
