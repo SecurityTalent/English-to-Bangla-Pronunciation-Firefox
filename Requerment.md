@@ -1,8 +1,8 @@
-# Product Requirements — English-to-Bangla Pronunciation Firefox Extension
+# Product Requirements — English-to-Bangla Pronunciation Chrome Extension
 
 ## Purpose
 
-When a user holds Ctrl and selects English text in Firefox, show a Bengali-script phonetic pronunciation near the selected text. When the user holds Alt and selects English text, show its Bengali meaning. These are separate actions and must never be confused.
+When a user holds Ctrl and selects English text in Chrome, show a Bengali-script phonetic pronunciation near the selected text. When the user holds Alt and selects English text, show its Bengali meaning. These are separate actions and must never be confused.
 
 Examples:
 

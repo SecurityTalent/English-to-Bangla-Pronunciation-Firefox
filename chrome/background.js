@@ -16,7 +16,6 @@ const BUILTIN_FAST_DICT = {
   "javascript": "জাভাস্ক্রিপ্ট",
   "extension": "এক্সটেনশন",
   "browser": "ব্রাউজার",
-  "firefox": "ফায়ারফক্স",
   "function": "ফাংশন",
   "variable": "ভ্যারিয়েবল",
   "database": "ডাটাবেজ",

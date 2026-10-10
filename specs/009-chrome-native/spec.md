@@ -8,7 +8,7 @@ The Chrome directory previously contained only a manifest while its implementati
 
 - Keep a complete, directly loadable Chrome extension source under `chrome/`.
 - Use Chrome Manifest V3 and Chrome's `chrome.*` extension APIs in Chrome code.
-- Keep Firefox implementation and packaging working independently.
+- Keep Chrome implementation isolated from other browser implementations.
 - Build the Chrome archive and unpacked install directory from `chrome/` only.
 - Track Chrome implementation and release work in this specification folder.
 
@@ -16,5 +16,5 @@ The Chrome directory previously contained only a manifest while its implementati
 
 1. `chrome/` contains its manifest, background service worker, content script and stylesheet, and options UI files.
 2. Chrome source does not reference Firefox's `browser` namespace or a cross-browser API fallback.
-3. `npm run build` packages the Chrome ZIP and unpacked folder from `chrome/`, while still producing Firefox ZIP/XPI packages.
+3. `npm run build` packages only the Chrome ZIP and unpacked folder from `chrome/`.
 4. Chrome manifest and JavaScript syntax checks pass, and the Chrome ZIP contains all required files at its root.
