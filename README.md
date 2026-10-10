@@ -25,7 +25,7 @@ Works with **Chrome** and **Firefox**. The browser extensions use a shared Node.
 
    ```powershell
    npm.cmd --prefix backend install
-   Copy-Item backend/.env.example backend/.env
+   if (-not (Test-Path backend/.env)) { Copy-Item backend/.env.example backend/.env }
    ```
 
 3. Add your key to `GEMINI_API_KEY` in `backend/.env`, then start the backend:
@@ -40,9 +40,23 @@ Works with **Chrome** and **Firefox**. The browser extensions use a shared Node.
    npm.cmd run build
    ```
 
-5. Load `dist/chrome-unpacked` in Chrome, or `dist/firefox-unpacked/manifest.json` in Firefox.
+5. Install the extension in your browser:
 
-For install details, troubleshooting, API information, and release steps, see [Setup guide](docs/setup.md). On macOS or Linux, use `npm` instead of `npm.cmd`.
+   **Chrome**
+
+   1. Open `chrome://extensions`.
+   2. Turn on **Developer mode**.
+   3. Click **Load unpacked** and select `dist/chrome-unpacked`.
+
+   **Firefox**
+
+   1. Open `about:debugging#/runtime/this-firefox`.
+   2. Click **Load Temporary Add-on...**.
+   3. Select `dist/firefox-unpacked/manifest.json`.
+
+   Temporary Firefox add-ons are removed when Firefox restarts. The generated `.xpi` is unsigned; a regular Firefox release needs a Mozilla-signed add-on for permanent installation. See the [Setup guide](docs/setup.md) for more details.
+
+For troubleshooting, API information, and release steps, see the [Setup guide](docs/setup.md). On macOS or Linux, use `npm` instead of `npm.cmd`.
 
 ## Privacy
 
