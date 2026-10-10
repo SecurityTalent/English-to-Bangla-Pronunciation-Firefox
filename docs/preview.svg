@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">English to Bangla Pronunciation preview</title>
+  <desc id="desc">A browser article with the selected word Authentication and its Bengali pronunciation, beside extension settings.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1f5fb"/><stop offset="1" stop-color="#e7edf7"/></linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#233657" flood-opacity=".10"/></filter>
+  </defs>
+  <rect width="960" height="420" rx="20" fill="url(#bg)"/>
+  <rect x="30" y="30" width="620" height="360" rx="16" fill="#fff" stroke="#dce4f0" filter="url(#shadow)"/>
+  <path d="M46 30h588a16 16 0 0 1 16 16v34H30V46a16 16 0 0 1 16-16Z" fill="#f7f9fc"/>
+  <circle cx="53" cy="56" r="5" fill="#c4cedd"/><circle cx="70" cy="56" r="5" fill="#c4cedd"/><circle cx="87" cy="56" r="5" fill="#c4cedd"/>
+  <rect x="119" y="43" width="420" height="26" rx="8" fill="#fff" stroke="#e3e9f1"/>
+  <text x="135" y="61" fill="#758197" font-family="Arial,sans-serif" font-size="12">example.com/article</text>
+  <text x="66" y="123" fill="#4c69c6" font-family="Arial,sans-serif" font-size="12" font-weight="700" letter-spacing="1.6">BROWSER PREVIEW</text>
+  <text x="66" y="164" fill="#18243d" font-family="Arial,sans-serif" font-size="27" font-weight="700">Read and learn as you browse</text>
+  <text x="66" y="211" fill="#657189" font-family="Arial,sans-serif" font-size="15">Hold Ctrl and select a word to see its Bengali pronunciation.</text>
+  <rect x="66" y="230" width="135" height="28" rx="5" fill="#dce8ff"/>
+  <text x="75" y="249" fill="#18243d" font-family="Arial,sans-serif" font-size="15" font-weight="700">Authentication</text>
+  <rect x="196" y="275" width="205" height="48" rx="11" fill="#17233e"/>
+  <text x="214" y="304" fill="#c5d0e4" font-family="Arial,sans-serif" font-size="11">CTRL + SELECT</text>
+  <text x="307" y="307" fill="#9af0dc" font-family="Arial,sans-serif" font-size="19" font-weight="700">অথেন্টিকেশন</text>
+  <text x="66" y="359" fill="#7a879b" font-family="Arial,sans-serif" font-size="13">Alt + select shows the Bengali meaning.</text>
+  <rect x="674" y="30" width="256" height="360" rx="16" fill="#fff" stroke="#dce4f0" filter="url(#shadow)"/>
+  <image href="../chrome/icons/icon.svg" x="696" y="52" width="38" height="38"/>
+  <text x="746" y="70" fill="#1d2a43" font-family="Arial,sans-serif" font-size="14" font-weight="700">Bangla Pronunciation</text>
+  <text x="746" y="88" fill="#7b8799" font-family="Arial,sans-serif" font-size="11">Extension settings</text>
+  <rect x="696" y="110" width="212" height="56" rx="10" fill="#effaf5"/>
+  <text x="710" y="134" fill="#27704e" font-family="Arial,sans-serif" font-size="13" font-weight="700">● Backend online</text>
+  <text x="710" y="152" fill="#53806a" font-family="Arial,sans-serif" font-size="11">Ready to look up words</text>
+  <text x="696" y="194" fill="#69758a" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing=".8">BACKEND URL</text>
+  <rect x="696" y="203" width="212" height="34" rx="7" fill="#fff" stroke="#dfe5ee"/>
+  <text x="706" y="224" fill="#526078" font-family="Arial,sans-serif" font-size="10">http://localhost:3000/api/pronunciation</text>
+  <rect x="696" y="248" width="212" height="34" rx="7" fill="#405fd0"/>
+  <text x="802" y="270" fill="#fff" font-family="Arial,sans-serif" font-size="12" text-anchor="middle" font-weight="700">Save settings</text>
+  <path d="M696 301h212" stroke="#edf0f5"/>
+  <text x="696" y="326" fill="#6f7b8f" font-family="Arial,sans-serif" font-size="11">Quick pronunciation test</text>
+  <text x="696" y="350" fill="#263854" font-family="Arial,sans-serif" font-size="13" font-weight="700">Authentication → অথেন্টিকেশন</text>
+</svg>

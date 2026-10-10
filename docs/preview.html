@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Extension preview</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #eef2f8; color: #18233a; font: 16px/1.5 Inter, "Segoe UI", sans-serif; }
+    main { width: 1100px; margin: 44px auto; }
+    header { display: flex; align-items: center; gap: 14px; margin: 0 0 26px 4px; }
+    header img { width: 58px; height: 58px; border-radius: 14px; }
+    h1 { margin: 0; font-size: 25px; letter-spacing: -.3px; }
+    .subtitle { margin: 2px 0 0; color: #69758b; }
+    .layout { display: grid; grid-template-columns: 1fr 310px; gap: 22px; align-items: start; }
+    .browser, .settings { background: white; border: 1px solid #dce3ee; border-radius: 16px; box-shadow: 0 14px 38px #24324b12; overflow: hidden; }
+    .chrome-bar { height: 48px; background: #f8f9fc; border-bottom: 1px solid #e6eaf1; display: flex; align-items: center; padding: 0 16px; gap: 8px; color: #8c96a8; font-size: 12px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #c8d0de; }
+    .address { margin-left: 12px; flex: 1; background: white; border: 1px solid #e6eaf1; border-radius: 8px; padding: 5px 12px; }
+    .article { padding: 40px 54px 42px; }
+    .eyebrow { color: #4263bd; font-size: 12px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; }
+    h2 { margin: 8px 0 12px; font-size: 31px; letter-spacing: -.7px; }
+    .article p { color: #59677e; font-size: 16px; line-height: 1.85; }
+    .selected { color: #18233a; background: #dce8ff; border-radius: 4px; padding: 1px 3px; box-shadow: 0 0 0 2px #dce8ff; }
+    .result { display: inline-flex; align-items: center; gap: 10px; margin: 14px 0 0 142px; padding: 10px 15px; background: #17233e; color: white; border: 1px solid #324466; border-radius: 11px; box-shadow: 0 8px 20px #1624412b; }
+    .result strong { color: #9af0dc; font-size: 18px; font-weight: 600; }
+    .result small { color: #c2cce0; font-size: 11px; }
+    .hint { margin-top: 28px; padding: 12px 14px; border: 1px solid #e8edf5; border-radius: 10px; color: #707d91; font-size: 13px; }
+    .settings { padding: 21px; }
+    .settings-head { display: flex; align-items: center; gap: 11px; padding-bottom: 16px; border-bottom: 1px solid #edf0f5; }
+    .settings-head img { width: 38px; height: 38px; border-radius: 10px; }
+    .settings-head strong { display: block; font-size: 14px; }
+    .settings-head span { display: block; color: #7b8799; font-size: 11px; }
+    .status { margin: 17px 0; padding: 12px; border-radius: 10px; background: #f0fbf6; color: #27704e; font-size: 12px; }
+    .status b { display: block; font-size: 14px; margin-bottom: 2px; }
+    label { display: block; margin: 16px 0 6px; color: #69758a; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .input { padding: 10px; border: 1px solid #dfe5ee; border-radius: 8px; color: #526078; font-size: 11px; white-space: nowrap; overflow: hidden; }
+    button { margin-top: 10px; width: 100%; border: 0; border-radius: 8px; padding: 10px; background: #405fd0; color: white; font-weight: 600; font-size: 12px; }
+    .test { margin-top: 19px; border-top: 1px solid #edf0f5; padding-top: 16px; }
+    .test p { margin: 0; color: #6f7b8f; font-size: 12px; }
+    .test strong { display: block; margin-top: 7px; color: #263854; font-size: 16px; }
+    footer { margin: 16px 4px 0; color: #8993a3; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <img src="../chrome/icons/icon.svg" alt="English to Bangla Pronunciation logo">
+      <div><h1>English to Bangla Pronunciation</h1><p class="subtitle">A quick look at the selection badge and browser settings</p></div>
+    </header>
+    <section class="layout">
+      <article class="browser">
+        <div class="chrome-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><div class="address">example.com/article</div><span>Extensions</span></div>
+        <div class="article">
+          <div class="eyebrow">Browser preview</div>
+          <h2>Read and learn as you browse</h2>
+          <p>When you meet a new word, hold <b>Ctrl</b> and select <span class="selected">Authentication</span> to see its Bengali pronunciation.</p>
+          <div class="result"><small>Ctrl + select</small><strong>অথেন্টিকেশন</strong></div>
+          <div class="hint"><b>Alt + select</b> shows the Bengali meaning. Results appear beside the selected text.</div>
+        </div>
+      </article>
+      <aside class="settings">
+        <div class="settings-head"><img src="../chrome/icons/icon.svg" alt=""><div><strong>Bangla Pronunciation</strong><span>Extension settings</span></div></div>
+        <div class="status"><b>● Backend online</b>Ready to look up words</div>
+        <label>Backend URL</label>
+        <div class="input">http://localhost:3000/api/pronunciation</div>
+        <button>Save settings</button>
+        <div class="test"><p>Quick pronunciation test</p><strong>Authentication → অথেন্টিকেশন</strong></div>
+      </aside>
+    </section>
+    <footer>Illustrative preview of the extension experience.</footer>
+  </main>
+</body>
+</html>
