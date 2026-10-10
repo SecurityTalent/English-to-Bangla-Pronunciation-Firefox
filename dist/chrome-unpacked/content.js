@@ -182,21 +182,48 @@
   }
 
   function sendRuntimeMessage(runtimeApi, message, callback, attempt = 0) {
+    const finishWithError = (error) => {
+      const rawMessage = typeof error === "string" ? error : error?.message || "";
+      const invalidated = /extension context invalidated|context invalidated/i.test(rawMessage);
+      callback(undefined, invalidated
+        ? "Extension was updated. Reload this page to reconnect."
+        : rawMessage || "Unknown extension messaging error");
+    };
+
     try {
       runtimeApi.sendMessage(message, (response) => {
-        const errorMessage = runtimeApi.lastError?.message;
+        let errorMessage = "";
+        try {
+          errorMessage = runtimeApi.lastError?.message || "";
+        } catch (error) {
+          // Reading lastError may itself fail after an extension reload.
+          finishWithError(error);
+          return;
+        }
+
+        // A stale content script cannot reconnect to a reloaded extension.
+        // Retrying only creates another rejected request and a noisy error.
+        if (/extension context invalidated|context invalidated/i.test(errorMessage)) {
+          finishWithError(errorMessage);
+          return;
+        }
         if (errorMessage && attempt === 0) {
           setTimeout(() => sendRuntimeMessage(runtimeApi, message, callback, 1), 150);
           return;
         }
-        callback(response, errorMessage || "");
+        if (errorMessage) finishWithError(errorMessage);
+        else callback(response, "");
       });
     } catch (err) {
+      if (/extension context invalidated|context invalidated/i.test(err?.message || "")) {
+        finishWithError(err);
+        return;
+      }
       if (attempt === 0) {
         setTimeout(() => sendRuntimeMessage(runtimeApi, message, callback, 1), 150);
         return;
       }
-      callback(undefined, err.message || "Unknown extension messaging error");
+      finishWithError(err);
     }
   }
 
@@ -409,7 +436,7 @@
           }
 
           if (messageErrorMessage) {
-            showBadge(freshRect, "warning", `⚠️ ${messageErrorMessage}. Reload the extension and this page.`);
+            showBadge(freshRect, "warning", `⚠️ ${messageErrorMessage}`);
             return;
           }
 
