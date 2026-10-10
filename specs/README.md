@@ -11,4 +11,5 @@ Keep `Requerment.md` as the product-level requirements source. Update the releva
 The Alt + selection meaning feature is tracked in `007-alt-selection-meaning/`.
 Production startup and deployment documentation is tracked in `008-production-docs/`.
 The Chrome MV3 implementation and release packaging are tracked in `009-chrome-native/`.
-The Chrome-only branch scope is tracked in `010-chrome-only-branch/`.
+The now-superseded Chrome-only branch scope is recorded in `010-chrome-only-branch/`.
+The separate Chrome and Firefox source trees are tracked in `011-dual-browser-layout/`.

@@ -16,5 +16,5 @@ The Chrome directory previously contained only a manifest while its implementati
 
 1. `chrome/` contains its manifest, background service worker, content script and stylesheet, and options UI files.
 2. Chrome source does not reference Firefox's `browser` namespace or a cross-browser API fallback.
-3. `npm run build` packages only the Chrome ZIP and unpacked folder from `chrome/`.
+3. `npm run build` packages Chrome output from `chrome/` and Firefox output independently from `firefox/`.
 4. Chrome manifest and JavaScript syntax checks pass, and the Chrome ZIP contains all required files at its root.

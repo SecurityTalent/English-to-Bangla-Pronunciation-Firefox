@@ -1,5 +1,7 @@
 # Chrome Only Branch
 
+> Superseded by `011-dual-browser-layout/`: the requested product now includes separate Chrome and Firefox source directories.
+
 ## Problem
 
 The Chrome branch still included the Firefox manifest, Firefox source files, Mozilla packaging, and Firefox-specific product text. Its Chrome options page also referenced an icon outside the Chrome source directory.

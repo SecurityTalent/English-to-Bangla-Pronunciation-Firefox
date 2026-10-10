@@ -3,22 +3,36 @@ const path = require("path");
 const { execSync } = require("child_process");
 
 const ROOT_DIR = __dirname;
-const SOURCE_DIR = path.join(ROOT_DIR, "chrome");
 const DIST_DIR = path.join(ROOT_DIR, "dist");
-const UNPACKED_DIR = path.join(DIST_DIR, "chrome-unpacked");
-const manifest = require(path.join(SOURCE_DIR, "manifest.json"));
-const zipPath = path.join(DIST_DIR, `bangla-phonetic-pronunciation-chrome-v${manifest.version}.zip`);
+const FILES = ["manifest.json", "background.js", "content.js", "content.css", "options.html", "options.js"];
 
-const files = ["manifest.json", "background.js", "content.js", "content.css", "options.html", "options.js"];
-fs.mkdirSync(DIST_DIR, { recursive: true });
-fs.rmSync(UNPACKED_DIR, { recursive: true, force: true });
-fs.mkdirSync(UNPACKED_DIR, { recursive: true });
+function buildPackage(browserName, sourceDir, makeXpi = false) {
+  const manifest = JSON.parse(fs.readFileSync(path.join(sourceDir, "manifest.json"), "utf8"));
+  const unpackedDir = path.join(DIST_DIR, `${browserName}-unpacked`);
+  const zipPath = path.join(DIST_DIR, `bangla-phonetic-pronunciation-${browserName}-v${manifest.version}.zip`);
+  fs.rmSync(unpackedDir, { recursive: true, force: true });
+  fs.mkdirSync(unpackedDir, { recursive: true });
 
-for (const file of files) {
-  fs.copyFileSync(path.join(SOURCE_DIR, file), path.join(UNPACKED_DIR, file));
+  for (const file of FILES) {
+    fs.copyFileSync(path.join(sourceDir, file), path.join(unpackedDir, file));
+  }
+  fs.cpSync(path.join(sourceDir, "icons"), path.join(unpackedDir, "icons"), { recursive: true });
+  execSync(`tar -a -cf "${zipPath}" *`, { cwd: unpackedDir, stdio: "inherit" });
+
+  let xpiPath;
+  if (makeXpi) {
+    xpiPath = path.join(DIST_DIR, `bangla-phonetic-pronunciation-v${manifest.version}.xpi`);
+    fs.copyFileSync(zipPath, xpiPath);
+  }
+
+  return { zipPath, unpackedDir, xpiPath };
 }
-fs.cpSync(path.join(SOURCE_DIR, "icons"), path.join(UNPACKED_DIR, "icons"), { recursive: true });
 
-execSync(`tar -a -cf "${zipPath}" *`, { cwd: UNPACKED_DIR, stdio: "inherit" });
-console.log(`Chrome ZIP: ${zipPath}`);
-console.log(`Chrome unpacked: ${UNPACKED_DIR}`);
+fs.mkdirSync(DIST_DIR, { recursive: true });
+const chrome = buildPackage("chrome", path.join(ROOT_DIR, "chrome"));
+const firefox = buildPackage("firefox", path.join(ROOT_DIR, "firefox"), true);
+console.log(`Chrome ZIP: ${chrome.zipPath}`);
+console.log(`Chrome unpacked: ${chrome.unpackedDir}`);
+console.log(`Firefox ZIP: ${firefox.zipPath}`);
+console.log(`Firefox XPI: ${firefox.xpiPath}`);
+console.log(`Firefox unpacked: ${firefox.unpackedDir}`);

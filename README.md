@@ -1,41 +1,40 @@
-# English to Bangla Pronunciation for Chrome
+# English to Bangla Pronunciation
 
-Chrome Manifest V3 extension that shows Bengali-script pronunciations and meanings for selected English text.
+Browser extensions for Bengali-script pronunciations and meanings of selected English text. Chrome and Firefox implementations live in separate directories and are built independently.
 
 ## Features
 
 - Hold **Ctrl** while selecting text for Bengali-script pronunciation.
 - Hold **Alt** while selecting text for a Bengali meaning.
 - Uses a local dictionary and browser cache before requesting the backend.
-- Uses Chrome's native `chrome.*` extension APIs and an MV3 service worker.
+- Chrome uses its MV3 service worker and `chrome.*` APIs. Firefox uses its own manifest and Firefox-compatible background implementation.
 
-## Chrome extension source
-
-The complete, directly loadable extension source is in `chrome/`:
+## Separate browser source
 
 ```text
-chrome/
-  manifest.json
-  background.js
-  content.js
-  content.css
-  icons/icon.svg
-  options.html
-  options.js
+chrome/                  Complete Chrome extension source (Chrome 91+)
+firefox/                 Complete Firefox extension source
+backend/                 Shared pronunciation and meaning API
+specs/                   Product and implementation tracking
 ```
 
-The manifest requires Chrome 91 or later.
+The browser source trees have separate manifests, scripts, options pages, and icons. Install or package each from its own build output; do not mix files between them.
 
-## Load unpacked
+## Load unpacked for development
 
-1. Run `npm run build` from the repository root.
-2. Open `chrome://extensions` and enable **Developer mode**.
-3. Select **Load unpacked** and choose `dist/chrome-unpacked`.
-4. Open `test_demo.html`. Hold Ctrl to test pronunciation or Alt to test meaning.
+Build both versions first:
+
+```powershell
+npm.cmd run build
+```
+
+- **Chrome:** open `chrome://extensions`, enable **Developer mode**, select **Load unpacked**, then choose `dist/chrome-unpacked`.
+- **Firefox:** open `about:debugging#/runtime/this-firefox`, select **Load Temporary Add-on...**, then choose `dist/firefox-unpacked/manifest.json`.
+- Open `test_demo.html`; hold Ctrl to test pronunciation or Alt to test meaning.
 
 ## Backend setup
 
-The extension defaults to `http://localhost:3000/api/pronunciation` for local development. Install and start the backend:
+The extension defaults to `http://localhost:3000/api/pronunciation` for local development. Install and start the shared backend:
 
 ```powershell
 npm --prefix backend install
@@ -43,18 +42,18 @@ Copy-Item backend/.env.example backend/.env
 npm start
 ```
 
-Set `GEMINI_API_KEY` in `backend/.env` for generated pronunciations and meanings outside the built-in dictionary. Keep the key private; it belongs on the backend and is never included in the extension.
+Set `GEMINI_API_KEY` in `backend/.env` for generated pronunciations and meanings outside the built-in dictionary. Keep the key private; it belongs on the backend and is never included in either extension.
 
-For a public release, deploy the backend at an HTTPS address, configure the extension's backend URL in its options, and configure abuse protection, usage monitoring, and a public privacy policy before store submission. The repository does not include a deployed production backend.
+For public releases, deploy the backend at an HTTPS address, configure the backend URL in each extension, and set up abuse protection, usage monitoring, and a public privacy policy before store submission. The repository does not include a deployed production backend.
 
-## Build
+## Build and release
 
 ```powershell
-npm run build
+npm.cmd run build
 ```
 
-This creates the Chrome Web Store ZIP and unpacked build in `dist/`. The source of both is `chrome/`.
+This creates separate Chrome and Firefox ZIPs and unpacked directories under `dist/`, plus a Firefox XPI. Upload the Chrome ZIP to the Chrome Web Store and the Firefox ZIP to Mozilla Add-ons after reviewing each store's permissions, validation, listing, and privacy requirements.
 
-## Development tracking
+## Project tracking
 
-The Chrome-only branch implementation is specified in `specs/009-chrome-native/` and `specs/010-chrome-only-branch/`. `Requerment.md` contains product-level selection and display requirements.
+Browser-specific source separation and build behavior are tracked in `specs/011-dual-browser-layout/`; Chrome API implementation details are in `specs/009-chrome-native/`.

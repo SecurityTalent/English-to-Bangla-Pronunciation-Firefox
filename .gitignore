@@ -25,3 +25,4 @@ yarn-error.log*
 dist/
 dist/extension/
 *.zip
+*.xpi

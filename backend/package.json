@@ -1,7 +1,7 @@
 {
   "name": "bangla-pronunciation-backend",
   "version": "1.0.0",
-  "description": "Backend API for Chrome Bengali Phonetic Pronunciation Extension",
+  "description": "Backend API for the Bengali Phonetic Pronunciation extensions",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -15,6 +15,7 @@
   },
   "keywords": [
     "chrome-extension",
+    "firefox-extension",
     "gemini-api",
     "phonetic-pronunciation",
     "bengali"

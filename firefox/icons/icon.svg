@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="tile" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#18294B" />
+      <stop offset="1" stop-color="#10172D" />
+    </linearGradient>
+    <linearGradient id="bubble" x1="23" y1="24" x2="92" y2="91" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" />
+      <stop offset="1" stop-color="#E8F0FF" />
+    </linearGradient>
+    <linearGradient id="wave" x1="98" y1="45" x2="119" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EEAD4" />
+      <stop offset="1" stop-color="#60A5FA" />
+    </linearGradient>
+    <filter id="shadow" x="8" y="9" width="112" height="112" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+      <feOffset dy="4" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.24" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="34" fill="url(#tile)" />
+  <path d="M31 19h47c10 0 18 8 18 18v32c0 10-8 18-18 18H57L39 101V87h-8c-10 0-18-8-18-18V37c0-10 8-18 18-18Z" fill="url(#bubble)" filter="url(#shadow)" />
+
+  <text x="38" y="62" text-anchor="middle" fill="#15233F" font-family="Arial, sans-serif" font-size="30" font-weight="700">A</text>
+  <circle cx="53" cy="57" r="2.5" fill="#38BDF8" />
+  <text x="72" y="64" text-anchor="middle" fill="#4F46E5" font-family="Nirmala UI, Noto Sans Bengali, sans-serif" font-size="34" font-weight="700">অ</text>
+
+  <path d="M99 45c5 6 5 19 0 25M106 39c9 9 9 28 0 37M113 34c12 12 12 38 0 49" fill="none" stroke="url(#wave)" stroke-linecap="round" stroke-width="3.5" />
+  <circle cx="103" cy="91" r="2.5" fill="#5EEAD4" />
+</svg>
