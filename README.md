@@ -4,8 +4,8 @@
 
 Select English text to see its Bengali pronunciation or meaning in Chrome or Firefox.
 
-[![Download Chrome](https://img.shields.io/badge/Download-Chrome%20package-4285F4?logo=googlechrome&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-chrome-v1.0.4.zip)
-[![Download Firefox](https://img.shields.io/badge/Download-Firefox%20package-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.2.zip)
+[![Download Chrome](https://img.shields.io/badge/Download-Chrome%20package-4285F4?logo=googlechrome&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-chrome-v1.0.5.zip)
+[![Download Firefox](https://img.shields.io/badge/Download-Firefox%20package-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.3.zip)
 
 <br>
 
@@ -22,23 +22,61 @@ Select English text to see its Bengali pronunciation or meaning in Chrome or Fir
 >
 > Select up to 500 characters. The result appears beside your selection.
 
-The built-in dictionary works without an API key for supported pronunciation words. For other pronunciations and all meanings, connect the extension to a running backend with a Gemini API key.
+The published extensions use the shared HTTPS API at `securitytalent-pronunciation-api.onrender.com`. You do not need to install Node.js or create a Gemini API key to use them. The API operator manages the key.
 
-## Quick setup
+## Install and get started
 
-The extension needs two parts: the browser add-on and a small backend service. Follow these steps even if you are not a developer.
+1. Download the package for your browser using one of the buttons above.
+2. Extract the downloaded ZIP file.
 
-### 1. Install Node.js
+**Chrome**
 
-Install **Node.js 18 or newer** from [nodejs.org](https://nodejs.org/). After installation, open PowerShell (Windows) or Terminal (macOS/Linux) in the project folder.
+1. Open `chrome://extensions`.
+2. Turn on **Developer mode**.
+3. Click **Load unpacked** and select the extracted Chrome package folder containing `manifest.json`.
+4. If an older copy is installed, reload or remove it before loading the new folder.
 
-### 2. Get a Gemini API key
+**Firefox**
 
-Create an API key in [Google AI Studio](https://aistudio.google.com/apikey). Keep the key private. Do not paste it into the extension, README, a screenshot, or a public GitHub file.
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on...** and select `manifest.json` inside the extracted Firefox package folder.
+3. Firefox removes temporary add-ons when it restarts, so load it again after restarting.
 
-### 3. Add the key and start the backend
+The Firefox ZIP is for temporary installation and testing. A permanent Firefox release must be signed by Mozilla.
 
-In PowerShell, run these commands from the project folder:
+### Check that the API is online
+
+Open the [API health check](https://securitytalent-pronunciation-api.onrender.com/api/health). A JSON response containing `"status":"ok"` means the backend is online. The extension toolbar settings also show the connection status.
+
+## API setup
+
+The extension's default backend URL is:
+
+```text
+https://securitytalent-pronunciation-api.onrender.com/api/pronunciation
+```
+
+The extension uses this URL for pronunciation and derives the meaning and health-check URLs from it. To change the backend, click the extension toolbar icon, enter the full pronunciation URL, and save it.
+
+The backend provides these endpoints:
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | Check whether the API is online and whether a Gemini key is configured. |
+| `POST` | `/api/pronunciation` | Get a Bengali-script pronunciation. |
+| `POST` | `/api/meaning` | Get a Bengali meaning. |
+
+Pronunciation and meaning endpoints require JSON with English text up to 500 characters:
+
+```json
+{"text":"authentication"}
+```
+
+Opening `/api/pronunciation` directly in a browser sends a GET request and returns 404. That is expected; lookup requests must use POST. The API health URL is the one to open for a browser check.
+
+## Run your own backend (optional)
+
+You only need this section to develop the project or use a private/local API. Install [Node.js 18 or newer](https://nodejs.org/) and create a Gemini key in [Google AI Studio](https://aistudio.google.com/apikey). From the project folder, run:
 
 ```powershell
 npm.cmd --prefix backend install
@@ -46,98 +84,46 @@ if (-not (Test-Path backend/.env)) { Copy-Item backend/.env.example backend/.env
 notepad backend/.env
 ```
 
-In Notepad, replace `your_gemini_api_key_here` after `GEMINI_API_KEY=` with your key, save the file, and close Notepad. Keep `backend/.env` on your computer; it is ignored by Git.
-
-Start the backend:
+In Notepad, set `GEMINI_API_KEY=` to your private key, save the file, and close Notepad. Then start the local API:
 
 ```powershell
 npm.cmd start
 ```
 
-Leave this window open while using the extension. Open <http://localhost:3000/api/health> in your browser. A JSON response containing `"status":"ok"` means the backend is running. The `hasApiKey` field should be `true` for generated lookups.
+Keep the terminal open while using the local API. In extension settings, change **Backend URL** to `http://localhost:3000/api/pronunciation`. The Gemini key belongs only in `backend/.env`; never add it to extension source or GitHub. On macOS/Linux, use `npm` instead of `npm.cmd`.
 
-On macOS or Linux, use `npm` instead of `npm.cmd`. For example: `npm --prefix backend install`, then `npm start`.
+## Deploy your own API
 
-### 4. Install the browser extension
+The default API is operated at the Render address above; this repository itself does not host the backend. To run a separate public service:
 
-Download the package using one of the buttons at the top, then extract the ZIP file.
-
-**Chrome**
-
-1. Open `chrome://extensions`.
-2. Turn on **Developer mode**.
-3. Click **Load unpacked** and select the extracted Chrome package folder (the folder containing `manifest.json`).
-4. If Chrome shows an older copy of this extension, remove it or reload the copy from the new folder.
-
-**Firefox**
-
-1. Extract the Firefox ZIP file.
-2. Open `about:debugging#/runtime/this-firefox`.
-3. Click **Load Temporary Add-on...** and select `manifest.json` inside the extracted Firefox package folder.
-
-Firefox temporary add-ons are removed when Firefox restarts. A permanent public Firefox release must be signed by Mozilla; the ZIP in this repository is for temporary installation and testing.
-
-### 5. Try a lookup
-
-Open a normal website, hold **Ctrl**, and select a word. Hold **Alt** and select it to see its Bengali meaning. Click the extension's toolbar icon to check backend status, change the backend address, or test a word.
-
-## API setup and endpoints
-
-The backend reads its settings from `backend/.env`:
-
-| Setting | What it does | Default |
-| --- | --- | --- |
-| `GEMINI_API_KEY` | Lets the backend ask Gemini for a result when the local dictionary/cache has no answer | No key |
-| `PORT` | Port where the backend listens | `3000` |
-| `GEMINI_MODEL` | Gemini model used for generation | `gemini-3.5-flash-lite` |
-
-The extension's default backend URL is `http://localhost:3000/api/pronunciation`. The extension derives the meaning and health URLs from it. To use a different local port or a hosted backend, click the extension icon, enter the full pronunciation URL, and save it. For a hosted service, use its HTTPS URL, for example `https://your-domain.example/api/pronunciation`.
-
-The API accepts JSON containing English text (up to 500 characters):
-
-```http
-POST /api/pronunciation
-Content-Type: application/json
-
-{"text":"authentication"}
-```
-
-It returns a `pronunciation` field in Bengali script. `POST /api/meaning` accepts the same JSON and returns a `meaning` field. `GET /api/health` reports whether the service is online, whether a key is configured, which model is selected, and the in-memory cache size. It does not return the API key.
-
-## Deploying a public backend
-
-The repository does **not** host a backend. The default `localhost` address only works on the computer running Node.js. Before giving the extension to public users:
-
-1. Deploy the `backend/` Node.js service to a server with a public HTTPS address.
-2. Configure `GEMINI_API_KEY` as a private environment variable in the hosting service. Never commit it.
-3. Set `PORT` if the host requires it. The server listens on `process.env.PORT`.
-4. Open `https://your-domain.example/api/health` and confirm it returns `"status":"ok"`.
-5. Set the extension backend URL to `https://your-domain.example/api/pronunciation`, or update the default URL in both `chrome/background.js` and `firefox/background.js` and rebuild.
-6. Protect a public API from abuse with suitable rate limits or authentication, and account for Gemini usage and costs.
-7. Replace the contact placeholder in [PRIVACY.md](PRIVACY.md), publish that policy, and submit the extensions to their browser stores for review/signing.
+1. Deploy the `backend/` Node.js service with HTTPS.
+2. Add `GEMINI_API_KEY` as a private environment variable on the host. Never commit it.
+3. Verify the deployed `/api/health` endpoint.
+4. Protect a public API with suitable rate limits or authentication and monitor Gemini usage.
+5. Set your HTTPS `/api/pronunciation` URL in extension settings, or update `DEFAULT_SETTINGS.backendUrl` in both browser background scripts and rebuild.
+6. Review and publish [PRIVACY.md](PRIVACY.md) for the actual service and its data handling.
 
 ## Build from source
 
-To build both browser packages locally, run this from the project folder:
+From the project folder, run:
 
 ```powershell
 npm.cmd run build
 ```
 
-The generated ZIPs, unpacked extension folders, and Firefox XPI are written to `dist/`. Ready-to-download packages are also checked into this repository's `dist/` folder. To run the backend checks, stop any backend already using port 3000, then run `npm.cmd test`.
+Builds appear in `dist/`: browser ZIPs, unpacked folders, and an unsigned Firefox XPI. The current packages are checked into GitHub so the download buttons above work. To run backend tests, stop any service already using port 3000 and run `npm.cmd test`.
 
 ## Troubleshooting
 
-- **Backend offline:** keep the backend terminal open and check <http://localhost:3000/api/health>.
-- **Gemini key not configured:** check the `GEMINI_API_KEY` line in `backend/.env`, save it, and restart `npm.cmd start`.
-- **Chrome reports an old content script:** update/reload the extension from the newly extracted folder, then refresh the website tab.
+- **API offline:** check the [hosted API health endpoint](https://securitytalent-pronunciation-api.onrender.com/api/health). If using a local API, keep its terminal open and check `http://localhost:3000/api/health`.
+- **Gemini key missing:** this is configured by the API operator. If you run your own backend, set `GEMINI_API_KEY` in `backend/.env` and restart it.
+- **Chrome shows an old content script:** reload the extension from the newly extracted folder, then refresh the website tab.
 - **No result appears:** select English text while holding Ctrl or Alt; the selection must be 500 characters or fewer.
-- **Port 3000 is already in use:** close the other server using that port, or choose another `PORT` in `backend/.env` and update the extension URL.
 - **Chrome on the local demo page:** open the extension's Details page, enable **Allow access to file URLs**, and reload the demo tab.
 
 ## Privacy
 
-Selected text is sent to the configured backend only when you request a lookup. The backend may send uncached text to Google Gemini. Review [PRIVACY.md](PRIVACY.md) before use. Do not send confidential text to a backend you do not trust.
+Selected text is sent to the configured backend only when you request a lookup. The backend may send uncached text to Google Gemini. Read [PRIVACY.md](PRIVACY.md) before use. Do not send confidential text to a backend you do not trust.
 
 ## Project layout
 
@@ -145,5 +131,5 @@ Selected text is sent to the configured backend only when you request a lookup. 
 - `firefox/` — Firefox extension source
 - `backend/` — shared Node.js API
 - `dist/` — built downloads and unpacked browser packages
-- `docs/setup.md` — additional setup and release notes
-- `PRIVACY.md` — privacy policy draft; complete its contact details before a public release
+- `docs/setup.md` — additional setup and release details
+- `PRIVACY.md` — privacy policy

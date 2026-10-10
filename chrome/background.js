@@ -1,6 +1,6 @@
 
 const DEFAULT_SETTINGS = {
-  backendUrl: "http://localhost:3000/api/pronunciation",
+  backendUrl: "https://securitytalent-pronunciation-api.onrender.com/api/pronunciation",
   debounceMs: 120,
   cacheEnabled: true
 };
@@ -131,7 +131,9 @@ async function getStoredSettings() {
   try {
     const result = await chrome.storage.local.get(["backendUrl", "debounceMs", "cacheEnabled"]);
     return {
-      backendUrl: result.backendUrl || DEFAULT_SETTINGS.backendUrl,
+      backendUrl: !result.backendUrl || result.backendUrl === "http://localhost:3000/api/pronunciation"
+        ? DEFAULT_SETTINGS.backendUrl
+        : result.backendUrl,
       debounceMs: result.debounceMs || DEFAULT_SETTINGS.debounceMs,
       cacheEnabled: result.cacheEnabled !== undefined ? result.cacheEnabled : DEFAULT_SETTINGS.cacheEnabled
     };
