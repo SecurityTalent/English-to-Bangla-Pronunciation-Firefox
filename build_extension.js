@@ -12,7 +12,7 @@ const COMMON_FILES = [
   "options.js"
 ];
 
-function stagePackage(target, manifestPath, includeFirefoxIcons = false, keepUnpacked = false) {
+function stagePackage(target, manifestPath, sourceDir = ROOT_DIR, includeFirefoxIcons = false, keepUnpacked = false) {
   const stageDir = path.join(DIST_DIR, `${target}-unpacked`);
   const manifest = require(manifestPath);
   const zipPath = path.join(DIST_DIR, `bangla-phonetic-pronunciation-${target}-v${manifest.version}.zip`);
@@ -21,7 +21,7 @@ function stagePackage(target, manifestPath, includeFirefoxIcons = false, keepUnp
 
   fs.copyFileSync(manifestPath, path.join(stageDir, "manifest.json"));
   for (const file of COMMON_FILES) {
-    fs.copyFileSync(path.join(ROOT_DIR, file), path.join(stageDir, file));
+    fs.copyFileSync(path.join(sourceDir, file), path.join(stageDir, file));
   }
 
   if (includeFirefoxIcons) {
@@ -42,7 +42,7 @@ fs.mkdirSync(DIST_DIR, { recursive: true });
 // Build Firefox and Chrome packages from the same shared extension code.
 console.log("Packaging Firefox and Chrome extensions...");
 const firefoxManifestPath = path.join(ROOT_DIR, "manifest.json");
-const firefoxZipPath = stagePackage("firefox", firefoxManifestPath, true);
+const firefoxZipPath = stagePackage("firefox", firefoxManifestPath, ROOT_DIR, true);
 const firefoxManifest = require(firefoxManifestPath);
 const xpiPath = path.join(DIST_DIR, `bangla-phonetic-pronunciation-v${firefoxManifest.version}.xpi`);
 try {
@@ -53,7 +53,8 @@ try {
   console.warn(`Existing XPI is locked; wrote ${updatedXpi}`);
 }
 const chromeManifestPath = path.join(ROOT_DIR, "chrome", "manifest.json");
-const chromeZipPath = stagePackage("chrome", chromeManifestPath, false, true);
+const chromeSourceDir = path.join(ROOT_DIR, "chrome");
+const chromeZipPath = stagePackage("chrome", chromeManifestPath, chromeSourceDir, false, true);
 
 console.log(`Firefox ZIP: ${firefoxZipPath}`);
 console.log(`Firefox XPI: ${xpiPath}`);

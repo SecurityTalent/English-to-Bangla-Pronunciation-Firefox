@@ -187,15 +187,14 @@ AMO validation and review are not guaranteed. Build packages locally or attach t
 
 ```text
 backend/                 Express API, built-in dictionary, and smoke test
-chrome/                  Chrome Manifest V3 configuration
+chrome/                  Complete Chrome extension source and Manifest V3 configuration
 icons/                   Extension's scalable vector icon
 specs/                   Specifications, plans, and task tracking
 background.js            Settings, cache, and backend requests
 content.js               Selection tracking and pronunciation badge
 manifest.json            Firefox Manifest V3 configuration
-chrome/manifest.json     Chrome Manifest V3 service worker configuration
 options.html / options.js Settings, health check, and quick test UI
-build_extension.js       ZIP/XPI packaging script
+build_extension.js       Firefox and Chrome ZIP/XPI packaging script
 PRIVACY.md               Privacy policy draft
 Requerment.md            Product requirements
 ```
