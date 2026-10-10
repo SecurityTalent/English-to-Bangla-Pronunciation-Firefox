@@ -26,4 +26,4 @@ Browser cache entries remain in Chrome or Firefox extension storage until cleare
 
 ## Contact
 
-For privacy questions, contact: [ADD A PUBLIC SUPPORT EMAIL]
+For privacy questions, contact [securi3ytalent@gmail.com](mailto:securi3ytalent@gmail.com) or visit [securitytalent.net](https://securitytalent.net/).
