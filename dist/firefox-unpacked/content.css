@@ -1,0 +1,18 @@
+/* Bangla Phonetic Pronunciation - Content Styles */
+
+/* Root container injected into document body */
+#bpp-pronunciation-host {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: visible !important;
+  z-index: 2147483647 !important; /* Maximum z-index */
+  pointer-events: none !important;
+}
+
+/* Ensure host does not cause layout shifts */
+#bpp-pronunciation-host * {
+  box-sizing: border-box !important;
+}
