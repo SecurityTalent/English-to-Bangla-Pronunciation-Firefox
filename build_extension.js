@@ -22,7 +22,10 @@ function buildPackage(browserName, sourceDir, makeXpi = false) {
   let xpiPath;
   if (makeXpi) {
     xpiPath = path.join(DIST_DIR, `bangla-phonetic-pronunciation-v${manifest.version}.xpi`);
-    fs.copyFileSync(zipPath, xpiPath);
+    // Replacing an existing XPI with copyFileSync can fail on Windows when
+    // antivirus/indexing briefly holds the destination. Write the archive
+    // bytes directly so repeated production builds reliably replace it.
+    fs.writeFileSync(xpiPath, fs.readFileSync(zipPath));
   }
 
   return { zipPath, unpackedDir, xpiPath };

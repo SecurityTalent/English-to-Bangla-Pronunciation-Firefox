@@ -181,6 +181,25 @@
     lastProcessedText = "";
   }
 
+  function sendRuntimeMessage(runtimeApi, message, callback, attempt = 0) {
+    try {
+      runtimeApi.sendMessage(message, (response) => {
+        const errorMessage = runtimeApi.lastError?.message;
+        if (errorMessage && attempt === 0) {
+          setTimeout(() => sendRuntimeMessage(runtimeApi, message, callback, 1), 150);
+          return;
+        }
+        callback(response, errorMessage || "");
+      });
+    } catch (err) {
+      if (attempt === 0) {
+        setTimeout(() => sendRuntimeMessage(runtimeApi, message, callback, 1), 150);
+        return;
+      }
+      callback(undefined, err.message || "Unknown extension messaging error");
+    }
+  }
+
   /**
    * Calculate position of selected text in page coordinates
    */
@@ -369,9 +388,10 @@
         return;
       }
 
-      runtimeApi.sendMessage(
+      sendRuntimeMessage(
+        runtimeApi,
         { action: mode === "meaning" ? "GET_MEANING" : "GET_PRONUNCIATION", text: text },
-        (response) => {
+        (response, messageErrorMessage) => {
           // Check if this request is still the latest active one
           if (requestId !== currentRequestId) return;
 
@@ -388,9 +408,8 @@
             return;
           }
 
-          const messageError = runtimeApi.lastError;
-          if (messageError) {
-            showBadge(freshRect, "warning", "⚠️ Extension request failed. Reload this page and try again.");
+          if (messageErrorMessage) {
+            showBadge(freshRect, "warning", `⚠️ ${messageErrorMessage}. Reload the extension and this page.`);
             return;
           }
 
@@ -420,7 +439,7 @@
       console.warn("[BPP Content] Message error:", err);
       const freshRect = getSelectionRect();
       if (freshRect && requestId === currentRequestId) {
-        showBadge(freshRect, "warning", "⚠️ Extension request failed. Reload this page and try again.");
+        showBadge(freshRect, "warning", `⚠️ ${err.message || "Extension messaging failed"}. Reload the extension and this page.`);
       }
     }
   }
