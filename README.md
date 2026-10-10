@@ -15,9 +15,12 @@ Select English text to see its Bengali pronunciation or meaning in Chrome or Fir
 
 ## Use the extension
 
-- Hold **Ctrl** and select English text for its Bengali pronunciation.
-- Hold **Alt** and select English text for its Bengali meaning.
-- Select up to 500 characters. The extension shows a result beside the selection.
+> [!IMPORTANT]
+> **Pronunciation:** Hold **Ctrl** while selecting English text.
+>
+> **Bengali meaning:** Hold **Alt** while selecting English text.
+>
+> Select up to 500 characters. The result appears beside your selection.
 
 The built-in dictionary works without an API key for supported pronunciation words. For other pronunciations and all meanings, connect the extension to a running backend with a Gemini API key.
 
