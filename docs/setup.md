@@ -8,6 +8,12 @@ https://securitytalent-pronunciation-api.onrender.com/api/pronunciation
 
 You do not need Node.js or your own Gemini API key to use those builds. Check the service at [API health](https://securitytalent-pronunciation-api.onrender.com/api/health); the response should contain `"status":"ok"`.
 
+## Render Free plan behavior
+
+The shared API currently runs as a Render Free web service. Render spins a Free service down after 15 minutes without inbound traffic. A request wakes it, and startup takes about one minute, so the first lookup after an idle period can be slow. Render describes Free instances as suitable for testing, hobby projects, and previews, and says not to use them for production applications. See [Render's official Free plan documentation](https://render.com/docs/free).
+
+If the Mozilla Add-ons release needs consistent response times, move the API to an always-on paid service before promoting it as production-ready. The extension default can remain this Render URL for the current update; to change providers later, set a different URL in extension settings or rebuild both packages with the new endpoint.
+
 ## Run your own backend
 
 For private use or development, install Node.js 18 or later and create a Gemini API key in [Google AI Studio](https://aistudio.google.com/apikey). From the repository root, install backend dependencies and create a local settings file if needed:

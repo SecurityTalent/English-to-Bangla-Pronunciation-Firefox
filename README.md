@@ -24,6 +24,9 @@ Select English text to see its Bengali pronunciation or meaning in Chrome or Fir
 
 The published extensions use the shared HTTPS API at `securitytalent-pronunciation-api.onrender.com`. You do not need to install Node.js or create a Gemini API key to use them. The API operator manages the key.
 
+> [!NOTE]
+> The shared API runs on Render's Free web service. After 15 minutes without traffic, Render spins it down; the first request after that can take about a minute to wake up. The pronunciation or meaning lookup may therefore appear slow after a quiet period. Render says Free instances are intended for testing, hobby projects, and previews, not production applications. See [Render's Free plan details](https://render.com/docs/free).
+
 ## Install and get started
 
 1. Download the package for your browser using one of the buttons above.
