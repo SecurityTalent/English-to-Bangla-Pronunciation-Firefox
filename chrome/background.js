@@ -1,5 +1,3 @@
-// Firefox & Chrome compatibility layer
-const extApi = typeof browser !== "undefined" ? browser : chrome;
 
 const DEFAULT_SETTINGS = {
   backendUrl: "http://localhost:3000/api/pronunciation",
@@ -132,7 +130,7 @@ for (const [k, v] of Object.entries(BUILTIN_FAST_DICT)) {
 // Helper to get storage values
 async function getStoredSettings() {
   try {
-    const result = await extApi.storage.local.get(["backendUrl", "debounceMs", "cacheEnabled"]);
+    const result = await chrome.storage.local.get(["backendUrl", "debounceMs", "cacheEnabled"]);
     return {
       backendUrl: result.backendUrl || DEFAULT_SETTINGS.backendUrl,
       debounceMs: result.debounceMs || DEFAULT_SETTINGS.debounceMs,
@@ -186,7 +184,7 @@ async function fetchPronunciation(text) {
   if (settings.cacheEnabled) {
     try {
       const storageKey = `bpp_cache_${cacheKey}`;
-      const cached = await extApi.storage.local.get(storageKey);
+      const cached = await chrome.storage.local.get(storageKey);
       if (cached && cached[storageKey]) {
         memoryCache.set(cacheKey, cached[storageKey]);
         return {
@@ -233,7 +231,7 @@ async function fetchPronunciation(text) {
         memoryCache.set(cacheKey, data.pronunciation);
         try {
           const storageKey = `bpp_cache_${cacheKey}`;
-          await extApi.storage.local.set({ [storageKey]: data.pronunciation });
+          await chrome.storage.local.set({ [storageKey]: data.pronunciation });
         } catch (e) {
           // Non-critical cache write error
         }
@@ -276,7 +274,7 @@ async function fetchMeaning(text) {
   const storageKey = `bpp_meaning_${cacheKey}`;
   if (settings.cacheEnabled) {
     try {
-      const cached = await extApi.storage.local.get(storageKey);
+      const cached = await chrome.storage.local.get(storageKey);
       if (cached?.[storageKey]) return { success: true, meaning: cached[storageKey], source: "extension-storage-cache" };
     } catch (e) { /* Continue to backend. */ }
   }
@@ -296,7 +294,7 @@ async function fetchMeaning(text) {
     if (!response.ok) return { success: false, error: data.error || `Server responded with HTTP ${response.status}`, needsApiKey: data.needsApiKey || false };
     if (!data?.meaning) return { success: false, error: "No meaning returned by server." };
     if (settings.cacheEnabled) {
-      try { await extApi.storage.local.set({ [storageKey]: data.meaning }); } catch (e) { /* Non-critical cache write. */ }
+      try { await chrome.storage.local.set({ [storageKey]: data.meaning }); } catch (e) { /* Non-critical cache write. */ }
     }
     return { success: true, meaning: data.meaning, source: data.source || "backend" };
   } catch (err) {
@@ -325,7 +323,7 @@ async function checkBackendHealth() {
 }
 
 // Handle runtime messages
-extApi.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "GET_PRONUNCIATION") {
     fetchPronunciation(message.text)
       .then(sendResponse)
@@ -357,7 +355,7 @@ extApi.runtime.onMessage.addListener((message, sender, sendResponse) => {
     for (const [k, v] of Object.entries(BUILTIN_FAST_DICT)) {
       memoryCache.set(k.toLowerCase(), v);
     }
-    extApi.storage.local.clear().then(() => {
+    chrome.storage.local.clear().then(() => {
       sendResponse({ success: true });
     });
     return true;
@@ -369,7 +367,7 @@ extApi.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === "SAVE_SETTINGS") {
-    extApi.storage.local.set(message.settings).then(() => {
+    chrome.storage.local.set(message.settings).then(() => {
       sendResponse({ success: true });
     });
     return true;

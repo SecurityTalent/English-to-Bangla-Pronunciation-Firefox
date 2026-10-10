@@ -35,7 +35,7 @@ Authentication
 Firefox content script → background script → pronunciation or meaning backend → Gemini API
 ```
 
-The extension sends requests to the configured backend. The backend handles dictionary lookups, caching, and Gemini API calls. The Gemini API key stays on the backend and is never included in the extension package.
+The extension sends requests to the configured backend. The backend handles dictionary lookups, caching, and Gemini API calls. The Gemini API key stays on the backend and is never included in the extension package. Firefox and Chrome have separate manifests and browser-specific source folders; `chrome/` is a complete Chrome MV3 extension using the `chrome.*` APIs.
 
 ## Get started
 
@@ -167,7 +167,7 @@ Render Free services sleep after inactivity and may take about a minute to wake.
 
 ## Privacy
 
-When a user selects text while holding Ctrl or Alt, the extension sends that text (up to 500 characters) to the configured backend. On a cache miss, the backend sends it to Gemini. Pronunciations and meanings use separate Firefox extension storage entries; the backend also keeps temporary in-memory caches.
+When a user selects text while holding Ctrl or Alt, the extension sends that text (up to 500 characters) to the configured backend. On a cache miss, the backend sends it to Gemini. Pronunciations and meanings use separate browser extension storage entries; the backend also keeps temporary in-memory caches.
 
 Before publication, verify the deployed service's actual data handling, replace the contact placeholder in [PRIVACY.md](PRIVACY.md), and publish the policy at a public URL. Disclose the text transfer and any provider retention in the AMO listing.
 

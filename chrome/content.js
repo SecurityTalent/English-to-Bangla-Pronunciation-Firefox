@@ -3,8 +3,6 @@
   if (window.__bpp_initialized) return;
   window.__bpp_initialized = true;
 
-  const extApi = typeof browser !== "undefined" ? browser : chrome;
-
   // Local cache for instant (<1ms) response on repeat selections
   const localCache = new Map();
 
@@ -365,7 +363,7 @@
 
     // Send request via background service to bypass CORS
     try {
-      extApi.runtime.sendMessage(
+      chrome.runtime.sendMessage(
         { action: mode === "meaning" ? "GET_MEANING" : "GET_PRONUNCIATION", text: text },
         (response) => {
           // Check if this request is still the latest active one

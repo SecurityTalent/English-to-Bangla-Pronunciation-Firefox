@@ -1,5 +1,6 @@
 {
   "manifest_version": 3,
+  "minimum_chrome_version": "91",
   "name": "Bangla Phonetic Pronunciation",
   "version": "1.0.2",
   "description": "Ctrl দিয়ে English pronunciation এবং Alt দিয়ে বাংলা অর্থ দেখুন।",

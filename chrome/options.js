@@ -1,4 +1,3 @@
-const extApi = typeof browser !== "undefined" ? browser : chrome;
 
 const statusBadge = document.getElementById("statusBadge");
 const statusText = document.getElementById("statusText");
@@ -14,7 +13,7 @@ const savedMsg = document.getElementById("savedMsg");
 
 // Load Settings
 async function loadSettings() {
-  extApi.runtime.sendMessage({ action: "GET_SETTINGS" }, (settings) => {
+  chrome.runtime.sendMessage({ action: "GET_SETTINGS" }, (settings) => {
     if (settings && settings.backendUrl) {
       backendUrlInput.value = settings.backendUrl;
     }
@@ -27,7 +26,7 @@ function checkStatus() {
   statusText.textContent = "Checking...";
   backendDetails.textContent = "";
 
-  extApi.runtime.sendMessage({ action: "CHECK_HEALTH" }, (response) => {
+  chrome.runtime.sendMessage({ action: "CHECK_HEALTH" }, (response) => {
     if (response && response.online) {
       statusBadge.className = "status-badge online";
       statusText.textContent = "Online";
@@ -46,7 +45,7 @@ btnSaveSettings.addEventListener("click", () => {
   const newUrl = backendUrlInput.value.trim();
   if (!newUrl) return;
 
-  extApi.runtime.sendMessage(
+  chrome.runtime.sendMessage(
     { action: "SAVE_SETTINGS", settings: { backendUrl: newUrl } },
     (res) => {
       savedMsg.style.display = "block";
@@ -66,7 +65,7 @@ function doTest() {
   testResult.textContent = "খোঁজা হচ্ছে...";
   testResult.style.color = "#94a3b8";
 
-  extApi.runtime.sendMessage({ action: "GET_PRONUNCIATION", text }, (res) => {
+  chrome.runtime.sendMessage({ action: "GET_PRONUNCIATION", text }, (res) => {
     if (res && res.success && res.pronunciation) {
       testResult.textContent = res.pronunciation;
       testResult.style.color = "#38bdf8";
@@ -87,7 +86,7 @@ testInput.addEventListener("keydown", (e) => {
 
 // Clear Cache
 btnClearCache.addEventListener("click", () => {
-  extApi.runtime.sendMessage({ action: "CLEAR_CACHE" }, (res) => {
+  chrome.runtime.sendMessage({ action: "CLEAR_CACHE" }, (res) => {
     alert("Extension cache cleared successfully!");
     checkStatus();
   });
