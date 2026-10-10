@@ -363,7 +363,13 @@
 
     // Send request via background service to bypass CORS
     try {
-      chrome.runtime.sendMessage(
+      const runtimeApi = globalThis.chrome?.runtime || globalThis.browser?.runtime;
+      if (!runtimeApi?.sendMessage) {
+        showBadge(rect, "warning", "⚠️ Chrome extension context unavailable. Reload the extension and this page.");
+        return;
+      }
+
+      runtimeApi.sendMessage(
         { action: mode === "meaning" ? "GET_MEANING" : "GET_PRONUNCIATION", text: text },
         (response) => {
           // Check if this request is still the latest active one
@@ -382,7 +388,7 @@
             return;
           }
 
-          const messageError = chrome.runtime.lastError;
+          const messageError = runtimeApi.lastError;
           if (messageError) {
             showBadge(freshRect, "warning", "⚠️ Extension request failed. Reload this page and try again.");
             return;
