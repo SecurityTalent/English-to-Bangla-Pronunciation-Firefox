@@ -14,6 +14,8 @@ The shared API currently runs as a Render Free web service. Render spins a Free 
 
 If the Mozilla Add-ons release needs consistent response times, move the API to an always-on paid service before promoting it as production-ready. The extension default can remain this Render URL for the current update; to change providers later, set a different URL in extension settings or rebuild both packages with the new endpoint.
 
+The public backend now limits each client IP to 60 lookup requests per minute by default. Excess requests receive HTTP `429` and a `Retry-After` header. Configure `API_RATE_LIMIT_PER_MINUTE` in the service environment to adjust this limit. This in-memory protection resets after service restarts and is not a substitute for a shared limiter or authentication at larger scale.
+
 ## Run your own backend
 
 For private use or development, install Node.js 18 or later and create a Gemini API key in [Google AI Studio](https://aistudio.google.com/apikey). From the repository root, install backend dependencies and create a local settings file if needed:

@@ -1,68 +1,69 @@
-// Test script to verify backend endpoints
-const http = require("http");
+const assert = require("assert");
+
+// Keep tests isolated from any locally running backend and make rate limiting deterministic.
+process.env.API_RATE_LIMIT_PER_MINUTE = "5";
+const app = require("./server.js");
 
 async function runTests() {
-  console.log("Starting backend automated tests...");
+  const server = app.listen(0, "127.0.0.1");
 
-  // Start the server in-process for testing
-  const app = require("express")();
-  // We can test against running server or run self-contained check
-  const testWords = [
-    { text: "Authentication", expected: "অথেন্টিকেশন" },
-    { text: "Vulnerability", expected: "ভালনারেবিলিটি" },
-    { text: "Prototype Pollution", expected: "প্রোটোটাইপ পলিউশন" }
-  ];
-
-  console.log("Checking test words against dictionary and cache...");
-  const serverModule = require("./server.js");
-
-  // Wait 500ms for server to bind
-  await new Promise(r => setTimeout(r, 500));
-
-  for (const { text, expected } of testWords) {
-    const postData = JSON.stringify({ text });
-    const options = {
-      hostname: "localhost",
-      port: 3000,
-      path: "/api/pronunciation",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Length": Buffer.byteLength(postData)
-      }
-    };
-
-    const result = await new Promise((resolve, reject) => {
-      const req = http.request(options, (res) => {
-        let body = "";
-        res.on("data", chunk => body += chunk);
-        res.on("end", () => {
-          try {
-            resolve({ statusCode: res.statusCode, data: JSON.parse(body) });
-          } catch (e) {
-            resolve({ statusCode: res.statusCode, raw: body });
-          }
-        });
-      });
-      req.on("error", reject);
-      req.write(postData);
-      req.end();
+  try {
+    await new Promise((resolve, reject) => {
+      server.once("listening", resolve);
+      server.once("error", reject);
     });
 
-    console.log(`Word: "${text}" => Response:`, result.data);
-    if (result.data.pronunciation !== expected) {
-      console.error(`FAILED: expected "${expected}", got "${result.data.pronunciation}"`);
-      process.exit(1);
-    } else {
-      console.log(`✅ PASSED: "${text}" -> "${result.data.pronunciation}" (source: ${result.data.source})`);
-    }
-  }
+    const baseUrl = `http://127.0.0.1:${server.address().port}`;
+    const healthResponse = await fetch(`${baseUrl}/api/health`);
+    assert.strictEqual(healthResponse.status, 200, "health endpoint should return 200");
+    assert.strictEqual((await healthResponse.json()).status, "ok", "health response should be ok");
 
-  console.log("\n🎉 All backend tests passed successfully!");
-  process.exit(0);
+    const rootResponse = await fetch(baseUrl);
+    assert.strictEqual(rootResponse.status, 200, "root health check should return 200");
+
+    const testWords = [
+      { text: "Authentication", expected: "অথেন্টিকেশন" },
+      { text: "Vulnerability", expected: "ভালনারেবিলিটি" },
+      { text: "Prototype Pollution", expected: "প্রোটোটাইপ পলিউশন" }
+    ];
+
+    for (const { text, expected } of testWords) {
+      const response = await fetch(`${baseUrl}/api/pronunciation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+      const data = await response.json();
+      assert.strictEqual(response.status, 200, `${text} should return 200`);
+      assert.strictEqual(data.pronunciation, expected, `${text} should match the built-in dictionary`);
+      console.log(`PASSED: ${text} -> ${data.pronunciation}`);
+    }
+
+    for (let i = 0; i < 2; i++) {
+      const response = await fetch(`${baseUrl}/api/pronunciation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "Authentication" })
+      });
+      assert.strictEqual(response.status, 200, "requests within the limit should succeed");
+    }
+
+    const limitedResponse = await fetch(`${baseUrl}/api/pronunciation`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: "Authentication" })
+    });
+    assert.strictEqual(limitedResponse.status, 429, "request over the limit should be throttled");
+    assert.ok(limitedResponse.headers.get("retry-after"), "rate limit response should include Retry-After");
+
+    console.log("PASSED: public lookup rate limit returns HTTP 429 with Retry-After");
+    console.log("All backend checks passed.");
+  } finally {
+    await new Promise(resolve => server.close(resolve));
+  }
 }
 
 runTests().catch(err => {
-  console.error("Test failed:", err);
-  process.exit(1);
+  console.error("Backend checks failed:", err);
+  process.exitCode = 1;
 });

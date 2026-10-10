@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-10
 
-This document is a publication draft. Before listing the extension, the service operator must replace the bracketed contact details, verify the deployed backend's behavior, and publish this policy at a public URL.
+This policy describes the extension and the shared Render backend. Before listing or distributing the extension, verify that it matches the live service configuration, hosting logs, retention, and provider terms, and publish it at a public URL.
 
 ## Information processed
 
@@ -11,6 +11,7 @@ This document is a publication draft. Before listing the extension, the service 
 - The backend checks its own cache and built-in pronunciation dictionary. On a further cache miss, it sends the text to Google Gemini to generate a Bengali phonetic pronunciation or meaning. The Gemini API key stays in the backend environment and is not included in either browser extension.
 - Chrome and Firefox store pronunciation and meaning cache entries and the backend URL in their respective browser extension storage. The toolbar's clear-cache action clears extension storage; this also resets the saved backend URL to the default. Removing the extension removes its local data.
 - The backend keeps temporary in-memory caches of submitted text, pronunciations, and meanings. These caches are lost when the backend process restarts. The current request log records the route, status, and duration, not the request body. Hosting or provider logs may have separate retention rules.
+- The backend temporarily processes the request IP address in memory to enforce a per-IP lookup rate limit. Rate-limit entries are removed when their one-minute window expires, with periodic cleanup running at least every ten seconds. The application request log does not include the IP address. The hosting provider may maintain its own network logs.
 
 ## How information is used
 
@@ -22,7 +23,7 @@ The operator of the configured backend can access text sent to that service. If 
 
 ## Retention and deletion
 
-Browser cache entries remain in Chrome or Firefox extension storage until cleared by the user or removed with the extension. Backend cache entries remain in process memory until the server restarts. The deployment operator must update this section if their hosting, logs, monitoring, or provider settings retain additional data.
+Browser cache entries remain in Chrome or Firefox extension storage until cleared by the user or removed with the extension. Backend text/result cache entries remain in process memory until the server restarts. Rate-limit IP entries are removed after their one-minute window, with cleanup at least every ten seconds. The deployment operator must update this section if hosting, logs, monitoring, or provider settings retain additional data.
 
 ## Contact
 

@@ -4,8 +4,8 @@
 
 Select English text to see its Bengali pronunciation or meaning in Chrome or Firefox.
 
-[![Download Chrome](https://img.shields.io/badge/Download-Chrome%20package-4285F4?logo=googlechrome&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-chrome-v1.0.5.zip)
-[![Download Firefox](https://img.shields.io/badge/Download-Firefox%20package-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.3.zip)
+[![Download Chrome](https://img.shields.io/badge/Download-Chrome%20package-4285F4?logo=googlechrome&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-chrome-v1.0.6.zip)
+[![Download Firefox](https://img.shields.io/badge/Download-Firefox%20package-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.4.zip)
 
 <br>
 
@@ -26,6 +26,8 @@ The published extensions use the shared HTTPS API at `securitytalent-pronunciati
 
 > [!NOTE]
 > The shared API runs on Render's Free web service. After 15 minutes without traffic, Render spins it down; the first request after that can take about a minute to wake up. The pronunciation or meaning lookup may therefore appear slow after a quiet period. Render says Free instances are intended for testing, hobby projects, and previews, not production applications. See [Render's Free plan details](https://render.com/docs/free).
+
+The public API limits each client IP to **60 pronunciation/meaning requests per minute** to reduce accidental or abusive Gemini usage. A `429` response means wait for the retry interval before trying again. This in-memory limit is basic abuse protection; it resets when the service restarts and is not a replacement for authentication or a shared rate limiter in a larger production service.
 
 ## Install and get started
 
@@ -69,6 +71,8 @@ The backend provides these endpoints:
 | `POST` | `/api/pronunciation` | Get a Bengali-script pronunciation. |
 | `POST` | `/api/meaning` | Get a Bengali meaning. |
 
+Lookup requests are rate-limited to 60 per client IP per minute by default. The backend returns HTTP `429` with a `Retry-After` header when a client exceeds the limit. Set `API_RATE_LIMIT_PER_MINUTE` in the backend environment to change the limit. This in-memory limit resets after service restarts and should be supplemented for a larger production deployment.
+
 Pronunciation and meaning endpoints require JSON with English text up to 500 characters:
 
 ```json
@@ -102,7 +106,7 @@ The default API is operated at the Render address above; this repository itself 
 1. Deploy the `backend/` Node.js service with HTTPS.
 2. Add `GEMINI_API_KEY` as a private environment variable on the host. Never commit it.
 3. Verify the deployed `/api/health` endpoint.
-4. Protect a public API with suitable rate limits or authentication and monitor Gemini usage.
+4. The backend includes a basic per-IP rate limit. For a larger public service, add authentication or a shared/edge rate limiter and monitor Gemini usage.
 5. Set your HTTPS `/api/pronunciation` URL in extension settings, or update `DEFAULT_SETTINGS.backendUrl` in both browser background scripts and rebuild.
 6. Review and publish [PRIVACY.md](PRIVACY.md) for the actual service and its data handling.
 

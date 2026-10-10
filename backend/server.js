@@ -6,9 +6,21 @@ const path = require("path");
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
+// Render terminates TLS and forwards one trusted proxy hop to the service.
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+const API_RATE_LIMIT_PER_MINUTE = Number.parseInt(process.env.API_RATE_LIMIT_PER_MINUTE, 10) || 60;
+const API_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const apiRateLimits = new Map();
+const rateLimitCleanupTimer = setInterval(() => {
+  const now = Date.now();
+  for (const [ip, bucket] of apiRateLimits) {
+    if (now - bucket.windowStartedAt >= API_RATE_LIMIT_WINDOW_MS) apiRateLimits.delete(ip);
+  }
+}, Math.min(10000, API_RATE_LIMIT_WINDOW_MS));
+rateLimitCleanupTimer.unref();
 
 // In-memory cache for fast lookups and API quota savings
 const pronunciationCache = new Map();
@@ -70,7 +82,7 @@ for (const [key, value] of Object.entries(builtinDictionary)) {
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "8kb" }));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -83,7 +95,7 @@ app.use((req, res, next) => {
 });
 
 // Health check endpoint
-app.get("/api/health", (req, res) => {
+app.get(["/", "/api/health"], (req, res) => {
   res.json({
     status: "ok",
     hasApiKey: Boolean(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 0),
@@ -91,6 +103,41 @@ app.get("/api/health", (req, res) => {
     cachedEntries: pronunciationCache.size + meaningCache.size
   });
 });
+
+function rateLimitApiRequests(req, res, next) {
+  const now = Date.now();
+  const clientIp = req.ip || req.socket.remoteAddress || "unknown";
+  let bucket = apiRateLimits.get(clientIp);
+
+  if (!bucket || now - bucket.windowStartedAt >= API_RATE_LIMIT_WINDOW_MS) {
+    bucket = { windowStartedAt: now, count: 0 };
+    apiRateLimits.set(clientIp, bucket);
+  }
+
+  if (bucket.count >= API_RATE_LIMIT_PER_MINUTE) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((API_RATE_LIMIT_WINDOW_MS - (now - bucket.windowStartedAt)) / 1000));
+    res.set("Retry-After", String(retryAfterSeconds));
+    return res.status(429).json({ error: "Too many lookup requests. Please wait a minute and try again." });
+  }
+
+  bucket.count += 1;
+  res.set("RateLimit-Limit", String(API_RATE_LIMIT_PER_MINUTE));
+  res.set("RateLimit-Remaining", String(API_RATE_LIMIT_PER_MINUTE - bucket.count));
+  res.set("RateLimit-Reset", String(Math.ceil((bucket.windowStartedAt + API_RATE_LIMIT_WINDOW_MS) / 1000)));
+
+  // Bound memory usage if many distinct IPs reach the public endpoint.
+  if (apiRateLimits.size > 10000) {
+    for (const [ip, entry] of apiRateLimits) {
+      if (now - entry.windowStartedAt >= API_RATE_LIMIT_WINDOW_MS) apiRateLimits.delete(ip);
+      if (apiRateLimits.size <= 10000) break;
+    }
+    while (apiRateLimits.size > 10000) {
+      apiRateLimits.delete(apiRateLimits.keys().next().value);
+    }
+  }
+
+  next();
+}
 
 /**
  * Call Gemini API with strict system prompt
@@ -219,7 +266,7 @@ Return ONLY the Bengali phonetic pronunciation.`;
 }
 
 // POST /api/pronunciation and POST /api/meaning
-app.post(["/api/pronunciation", "/api/meaning"], async (req, res) => {
+app.post(["/api/pronunciation", "/api/meaning"], rateLimitApiRequests, async (req, res) => {
   let mode = req.path.endsWith("/meaning") ? "meaning" : "pronunciation";
   let resultField = mode;
   try {
@@ -320,13 +367,17 @@ app.post(["/api/pronunciation", "/api/meaning"], async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`=================================================`);
-  console.log(`🚀 Bangla Phonetic Backend running on http://localhost:${PORT}`);
-  console.log(`📡 Endpoint: POST http://localhost:${PORT}/api/pronunciation`);
-  console.log(`📡 Meaning endpoint: POST http://localhost:${PORT}/api/meaning`);
-  console.log(`🩺 Health check: GET http://localhost:${PORT}/api/health`);
-  console.log(`🔑 Gemini API Key configured: ${Boolean(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 0)}`);
-  console.log(`📚 Preloaded dictionary words: ${pronunciationCache.size}`);
-  console.log(`=================================================`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log("=================================================");
+    console.log(`Bangla Phonetic Backend listening on port ${PORT}`);
+    console.log("Pronunciation API: POST /api/pronunciation");
+    console.log("Meaning API: POST /api/meaning");
+    console.log("Health check: GET /api/health");
+    console.log(`Gemini API key configured: ${Boolean(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 0)}`);
+    console.log(`Preloaded dictionary words: ${pronunciationCache.size}`);
+    console.log("=================================================");
+  });
+}
+
+module.exports = app;
