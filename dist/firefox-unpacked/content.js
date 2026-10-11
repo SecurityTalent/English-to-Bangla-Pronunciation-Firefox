@@ -451,7 +451,8 @@
     if (e.key === "Alt") isAltDown = false;
 
     // Support keyboard selection (e.g. Shift + Arrow with Ctrl)
-    if ((e.shiftKey || e.key.startsWith("Arrow")) && (e.ctrlKey || isCtrlDown || e.altKey || isAltDown)) {
+    const key = typeof e.key === "string" ? e.key : "";
+    if ((e.shiftKey || key.startsWith("Arrow")) && (e.ctrlKey || isCtrlDown || e.altKey || isAltDown)) {
       const altActive = e.altKey || isAltDown;
       const ctrlActive = e.ctrlKey || isCtrlDown;
       const mode = altActive === ctrlActive ? null : (altActive ? "meaning" : "pronunciation");

@@ -250,12 +250,12 @@ async function fetchPronunciation(text) {
     };
   } catch (err) {
     clearTimeout(timeoutId);
-    console.error("[BPP Background] Fetch error:", err);
+    console.error("[BPP Background] Fetch error:", err?.name || "Error", err?.message || String(err));
 
-    if (err.name === "AbortError") {
+    if (err?.name === "AbortError" || controller.signal.aborted) {
       return {
         success: false,
-        error: "Backend request timed out (12s). Please check your internet connection."
+        error: "Backend request timed out (12s). Try again in a moment."
       };
     }
 
@@ -299,8 +299,8 @@ async function fetchMeaning(text) {
     return { success: true, meaning: data.meaning, source: data.source || "backend" };
   } catch (err) {
     clearTimeout(timeoutId);
-    return err.name === "AbortError"
-      ? { success: false, error: "Backend request timed out (12s)." }
+    return err?.name === "AbortError" || controller.signal.aborted
+      ? { success: false, error: "Backend request timed out (12s). Try again in a moment." }
       : { success: false, error: "Cannot connect to backend server.", unreachable: true };
   }
 }
@@ -372,6 +372,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
+});
+
+// Start waking the hosted API before the user makes their first selection.
+function warmBackend() {
+  checkBackendHealth().catch(() => {});
+}
+
+chrome.runtime.onStartup.addListener(warmBackend);
+chrome.runtime.onInstalled.addListener(() => {
+  warmBackend();
+  chrome.tabs.query({}).then((tabs) => {
+    for (const tab of tabs) {
+      if (!tab.id || !tab.url || !/^https?:/.test(tab.url)) continue;
+      const target = { tabId: tab.id };
+      chrome.scripting.insertCSS({ target, files: ["content.css"] })
+        .then(() => chrome.scripting.executeScript({ target, files: ["content.js"] }))
+        .catch(() => {
+          // Restricted pages cannot be injected; the user can refresh those tabs if needed.
+        });
+    }
+  }).catch(() => {});
 });
 
 console.log("[BPP Background] Bangla Phonetic Pronunciation background service active.");
