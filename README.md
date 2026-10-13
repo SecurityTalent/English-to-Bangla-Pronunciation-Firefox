@@ -2,77 +2,77 @@
 
 # English to Bangla Pronunciation
 
-Chrome ও Firefox-এ নির্বাচিত ইংরেজি শব্দের বাংলা উচ্চারণ বা অর্থ দেখুন।
+Look up the Bangla pronunciation or meaning of selected English text in Chrome and Firefox.
 
 [![Firefox Add-ons](https://img.shields.io/badge/Firefox-Mozilla%20Add--ons-FF7139?logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/en-US/firefox/addon/bangla-phonetic-pronunciation/)
-[![Chrome ডাউনলোড](https://img.shields.io/badge/ডাউনলোড-Chrome%20package-4285F4?logo=googlechrome&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-chrome-v1.0.8.zip)
-[![Firefox প্যাকেজ](https://img.shields.io/badge/Firefox-প্যাকেজ-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.6.zip)
+[![Download Chrome](https://img.shields.io/badge/Download-Chrome%20package-4285F4?logo=googlechrome&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-chrome-v1.0.8.zip)
+[![Firefox package](https://img.shields.io/badge/Firefox-package-FF7139?logo=firefoxbrowser&logoColor=white)](https://github.com/SecurityTalent/English-to-Bangla-Pronunciation-Firefox/raw/refs/heads/main/dist/bangla-phonetic-pronunciation-firefox-v1.0.6.zip)
 
 <br>
-<img src="docs/preview.svg" alt="এক্সটেনশনের উচ্চারণ ব্যাজ ও সেটিংস" width="760">
+<img src="docs/preview.svg" alt="Extension pronunciation badge and settings" width="760">
 </div>
 
-## কীভাবে ব্যবহার করবেন
+## How to use
 
 > [!IMPORTANT]
-> **উচ্চারণ:** ইংরেজি লেখা নির্বাচন করার সময় **Ctrl** চেপে ধরুন।
+> **Pronunciation:** Hold **Ctrl** while selecting English text.
 >
-> **বাংলা অর্থ:** লেখা নির্বাচন করার সময় **Alt** চেপে ধরুন।
+> **Bangla meaning:** Hold **Alt** while selecting English text.
 >
-> একবারে সর্বোচ্চ ৫০০ অক্ষর নির্বাচন করা যায়। ফলাফল নির্বাচিত লেখার পাশে দেখা যায়।
+> You can select up to 500 characters at a time. The result appears beside your selection.
 
-প্রকাশিত বিল্ডগুলো `securitytalent-pronunciation-api.onrender.com` HTTPS API ব্যবহার করে। ব্যবহার করতে Node.js বা নিজের Gemini API key লাগবে না; API পরিচালনাকারী key-টি রাখেন।
+The published builds use the shared HTTPS API at `securitytalent-pronunciation-api.onrender.com`. You do not need Node.js or your own Gemini API key to use the published extension; the API operator manages the key.
 
 > [!WARNING]
-> এই সংস্করণে API Render-এর **Free** hosting এবং Gemini API-এর ফ্রি/কোটা-নির্ভর সুবিধার ওপর চলে। ১৫ মিনিট অনুরোধ না এলে Render Free সার্ভারটি sleep-এ যায়; পরের অনুরোধে জাগতে প্রায় এক মিনিট লাগতে পারে। ফ্রি host বা API-তে quota/ব্যবহারসীমা, rate limit, সাময়িক outage, restart, নীতিমালা বা মূল্য পরিবর্তনের কারণে lookup ধীর বা বন্ধ হতে পারে। Render Free production অ্যাপের জন্য নয়; নিরবচ্ছিন্ন সেবার নিশ্চয়তা নেই। Extension-এর নির্বাচিত লেখা cache miss হলে Gemini-তে পাঠানো হয়। Gemini-র free tier-এ জমা দেওয়া content Google-এর পণ্য উন্নত করতে ব্যবহৃত হতে পারে। API key সার্ভারে private রাখা হয়, তবে উন্মুক্ত shared API অপব্যবহৃত হলে পরিচালনাকারীর Gemini quota শেষ বা service সীমিত হতে পারে। সংবেদনশীল লেখা পাঠাবেন না; [Render Free plan](https://render.com/docs/free), [Gemini API pricing ও data use](https://ai.google.dev/gemini-api/docs/pricing) দেখুন।
+> This version relies on Render's **Free** hosting and Gemini API's free or quota-limited tier. Render puts a free service to sleep after 15 minutes without inbound traffic; the next request can take about a minute to wake it up. Free hosting and APIs may impose quotas and rate limits, restart, become temporarily unavailable, or change their terms or prices. Lookups may be slow or unavailable, and continuous service is not guaranteed. Render says Free instances are not for production applications. When a lookup is not in the backend cache, the selected text is sent to Gemini. Content submitted through Gemini's free tier may be used by Google to improve its products. The API key is kept private on the server, but abuse of the public shared API could exhaust the operator's Gemini quota or cause the service to be limited. Do not send sensitive text. See [Render's Free plan](https://render.com/docs/free) and [Gemini API pricing and data use](https://ai.google.dev/gemini-api/docs/pricing).
 
-পাবলিক API-তে প্রতি IP থেকে ডিফল্টে মিনিটে **৬০টি** lookup করা যায়। সীমা পেরোলে `429` আসে; `Retry-After` সময় অপেক্ষা করে আবার চেষ্টা করুন। সীমাটি সার্ভারের মেমরিতে রাখা হয়, তাই সার্ভার restart হলে reset হয়।
+The public API allows **60 lookups per minute per IP** by default. Requests over the limit receive `429`; wait for the `Retry-After` interval before trying again. The limit is stored in server memory and resets when the server restarts.
 
-## ইনস্টল
+## Install
 
-1. উপরের বোতাম থেকে আপনার ব্রাউজারের ZIP নামিয়ে Extract করুন।
+1. Download the ZIP for your browser using a button above and extract it.
 
 **Chrome**
 
-1. `chrome://extensions` খুলুন এবং **Developer mode** চালু করুন।
-2. **Load unpacked** চাপুন এবং Extract করা Chrome ফোল্ডারটি নির্বাচন করুন, যেখানে `manifest.json` আছে।
-3. পুরোনো কপি থাকলে নতুন ফোল্ডার লোড করার পর reload করুন বা পুরোনোটি সরান।
+1. Open `chrome://extensions` and enable **Developer mode**.
+2. Click **Load unpacked** and select the extracted Chrome folder containing `manifest.json`.
+3. If an older copy is installed, reload it or remove it after loading the new folder.
 
 **Firefox**
 
-Firefox 140 বা নতুন সংস্করণ প্রয়োজন। নির্বাচিত ওয়েবপেজের লেখা lookup-এর জন্য backend-এ পাঠানো হয় বলে Firefox-এর ডেটা সম্মতির বার্তা দেখায়।
+Firefox 140 or newer is required. Firefox displays its data-consent prompt because selected webpage text is sent to the backend when you request a lookup.
 
-1. `about:debugging#/runtime/this-firefox` খুলুন।
-2. **Load Temporary Add-on...** চাপুন এবং Extract করা Firefox ফোল্ডারের `manifest.json` নির্বাচন করুন।
-3. Firefox restart করলে অস্থায়ী add-on সরিয়ে দেয়; restart-এর পর আবার লোড করুন।
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on...** and select `manifest.json` in the extracted Firefox folder.
+3. Firefox removes temporary add-ons when it restarts. Load the add-on again after a restart.
 
-স্থায়ী ব্যবহারের জন্য [Mozilla Add-ons-এ Firefox সংস্করণটি](https://addons.mozilla.org/en-US/firefox/addon/bangla-phonetic-pronunciation/) দেখুন। ডাউনলোডযোগ্য Firefox ZIP/XPI পরীক্ষার জন্য; স্থায়ী Firefox release-এ Mozilla-র signing লাগে।
+For a permanent installation, get the [Firefox version from Mozilla Add-ons](https://addons.mozilla.org/en-US/firefox/addon/bangla-phonetic-pronunciation/). The downloadable Firefox ZIP/XPI is for testing; permanent Firefox releases require Mozilla signing.
 
-### API সচল আছে কি না দেখুন
+### Check API availability
 
-[API health check](https://securitytalent-pronunciation-api.onrender.com/api/health) খুলুন। `"status":"ok"` থাকলে backend উত্তর দিচ্ছে। Extension toolbar-এর সেটিংসেও সংযোগের অবস্থা দেখা যায়। সার্ভার সচল থাকলেও Gemini quota বা provider সমস্যায় lookup ব্যর্থ হতে পারে।
+Open the [API health check](https://securitytalent-pronunciation-api.onrender.com/api/health). A response containing `"status":"ok"` means the backend is responding. The extension toolbar settings also show the connection status. A healthy server does not guarantee that lookups will succeed if Gemini quota or provider services are unavailable.
 
 ## API
 
-ডিফল্ট pronunciation URL:
+Default pronunciation URL:
 
 ```text
 https://securitytalent-pronunciation-api.onrender.com/api/pronunciation
 ```
 
-Extension সেটিংসে সম্পূর্ণ pronunciation URL বদলালে meaning ও health URL সেখান থেকে নির্ধারিত হয়।
+If you change the full pronunciation URL in extension settings, the meaning and health URLs are derived from it.
 
-| Method | Endpoint | কাজ |
+| Method | Endpoint | Description |
 | --- | --- | --- |
-| `GET` | `/api/health` | API health, Gemini key সেট করা আছে কি না, model ও cache size জানায়; key নিজে প্রকাশ করে না। |
-| `POST` | `/api/pronunciation` | বাংলা হরফে উচ্চারণ দেয়। |
-| `POST` | `/api/meaning` | সংক্ষিপ্ত বাংলা অর্থ দেয়। |
+| `GET` | `/api/health` | Reports API health, whether a Gemini key is configured, the model, and cache size. It does not reveal the key. |
+| `POST` | `/api/pronunciation` | Returns pronunciation in Bangla script. |
+| `POST` | `/api/meaning` | Returns a concise Bangla meaning. |
 
-Lookup-এর JSON: `{"text":"authentication"}`। লেখা ফাঁকা হতে পারবে না এবং ৫০০ অক্ষরের বেশি হলে গ্রহণ করা হয় না। `/api/pronunciation` ব্রাউজারে সরাসরি খুললে GET হওয়ায় 404 আসা স্বাভাবিক; ব্রাউজারে পরীক্ষা করতে `/api/health` খুলুন।
+Lookup request JSON: `{"text":"authentication"}`. Text cannot be empty or longer than 500 characters. Opening `/api/pronunciation` directly in a browser sends a GET request and may return 404; use `/api/health` to check availability.
 
-## নিজের backend চালানো (ঐচ্ছিক)
+## Run your own backend (optional)
 
-Development বা ব্যক্তিগত API-র জন্য [Node.js 18+](https://nodejs.org/) ইনস্টল করুন এবং [Google AI Studio](https://aistudio.google.com/apikey) থেকে Gemini key নিন। প্রকল্পের মূল ফোল্ডারে চালান:
+For development or a private API, install [Node.js 18+](https://nodejs.org/) and get a Gemini key from [Google AI Studio](https://aistudio.google.com/apikey). Run these commands from the project root:
 
 ```powershell
 npm.cmd --prefix backend install
@@ -80,51 +80,51 @@ if (-not (Test-Path backend/.env)) { Copy-Item backend/.env.example backend/.env
 notepad backend/.env
 ```
 
-`backend/.env`-এ `GEMINI_API_KEY=`-এর পরে নিজের key লিখে সংরক্ষণ করুন। তারপর:
+Set `GEMINI_API_KEY=` in `backend/.env` to your key and save the file. Then run:
 
 ```powershell
 npm.cmd start
 ```
 
-টার্মিনাল চালু রাখুন। Extension সেটিংসে Backend URL দিন `http://localhost:3000/api/pronunciation`। Key শুধু backend-এর `.env`-এ রাখুন; extension source বা GitHub-এ কখনো যোগ করবেন না। macOS/Linux-এ `npm.cmd`-এর বদলে `npm` ব্যবহার করুন।
+Keep the terminal open while using the API. Set the extension's Backend URL to `http://localhost:3000/api/pronunciation`. Keep the key only in the backend's `.env` file; never add it to extension source or GitHub. On macOS/Linux, use `npm` instead of `npm.cmd`.
 
-## নিজের API deploy করা
+## Deploy your own API
 
-1. `backend/`-কে HTTPS-সমর্থিত host-এ deploy করুন।
-2. `GEMINI_API_KEY`-কে host-এর private environment variable হিসেবে সেট করুন; repository-তে commit করবেন না।
-3. `/api/health` পরীক্ষা করুন এবং Gemini usage/quota নজরে রাখুন।
-4. বড় বা public ব্যবহারের জন্য authentication বা shared/edge rate limiter যোগ করুন। বর্তমান in-memory per-IP সীমা restart-এ মুছে যায় এবং একা যথেষ্ট abuse protection নয়।
-5. Extension সেটিংসে নতুন HTTPS `/api/pronunciation` URL দিন অথবা দুই browser-এর background script-এ `DEFAULT_SETTINGS.backendUrl` বদলে build করুন।
-6. বাস্তব hosting, log ও retention অনুযায়ী [গোপনীয়তা নীতি](PRIVACY.md) হালনাগাদ ও প্রকাশ করুন।
+1. Deploy `backend/` to a host that supports HTTPS.
+2. Set `GEMINI_API_KEY` as a private environment variable on the host; never commit it to the repository.
+3. Check `/api/health` and monitor Gemini usage and quota.
+4. For larger or public use, add authentication or a shared/edge rate limiter. The current in-memory per-IP limit resets on restart and is not sufficient abuse protection by itself.
+5. Set the new HTTPS `/api/pronunciation` URL in extension settings, or change `DEFAULT_SETTINGS.backendUrl` in both browser background scripts and build the packages again.
+6. Update and publish the [privacy policy](PRIVACY.md) to reflect the actual hosting, logs, and retention practices.
 
-ফ্রি hosting-কে গুরুত্বপূর্ণ বা production সেবার নিশ্চয়তা হিসেবে ধরবেন না। Host-এর sleep, restart, cold start, bandwidth/compute quota, outage, নীতিমালা/মূল্য পরিবর্তন এবং account/service suspension-এর ঝুঁকি আছে। Gemini-র ফ্রি quota সীমিত ও পরিবর্তনশীল; shared public API-তে অতিরিক্ত বা অপব্যবহারমূলক অনুরোধ quota দ্রুত শেষ করতে পারে। Gemini free-tier request-এর content Google-এর পণ্য উন্নত করতে ব্যবহৃত হতে পারে—তাই user-এর সংবেদনশীল লেখা পাঠানোর আগে বর্তমান data-use শর্ত দেখুন। নির্ভরযোগ্য সেবার জন্য provider-এর বর্তমান শর্ত যাচাই করে paid/always-on hosting, usage monitoring ও ব্যয়সীমা পরিকল্পনা করুন।
+Do not rely on free hosting for critical or production services. Hosts may sleep or restart services, impose bandwidth or compute quotas, experience outages, change terms or prices, or suspend accounts and services. Gemini's free quota is limited and can change; heavy or abusive use of a shared public API can quickly exhaust the operator's quota. Content submitted through Gemini's free tier may be used by Google to improve its products, so review current data-use terms before sending users' sensitive text. For reliable service, review current provider terms and plan for paid or always-on hosting, usage monitoring, and spending limits.
 
-## Source থেকে build
+## Build from source
 
 ```powershell
 npm.cmd run build
 ```
 
-ফলাফল `dist/`-এ: browser ZIP, unpacked folder এবং unsigned Firefox XPI। Backend পরীক্ষা চালাতে port 3000-এ চলমান service বন্ধ করে `npm.cmd test` ব্যবহার করুন।
+The build outputs browser ZIPs, unpacked folders, and an unsigned Firefox XPI in `dist/`. To run backend tests, stop any service using port 3000 and run `npm.cmd test`.
 
-## সমস্যা সমাধান
+## Troubleshooting
 
-- **API বন্ধ বা ধীর:** [health endpoint](https://securitytalent-pronunciation-api.onrender.com/api/health) দেখুন। Render Free-তে দীর্ঘ বিরতির পর প্রথম lookup ধীর হতে পারে।
-- **Gemini key নেই:** প্রকাশিত API-র operator-কে জানাতে হবে। নিজের backend হলে `backend/.env`-এ key দিয়ে restart করুন।
-- **ফল আসে না:** Ctrl বা Alt ধরে ইংরেজি লেখা নির্বাচন করুন; ৫০০ অক্ষরের মধ্যে রাখুন। API error/quota হলে পরে আবার চেষ্টা করুন।
-- **পুরোনো Chrome code:** নতুন folder থেকে extension reload করে webpage refresh করুন।
-- **Chrome local demo:** Extension Details-এ **Allow access to file URLs** চালু করে demo tab reload করুন।
+- **API is slow or unavailable:** Check the [health endpoint](https://securitytalent-pronunciation-api.onrender.com/api/health). The first lookup after a quiet period may be slow on Render Free.
+- **Gemini key is missing:** Contact the operator of the published API. For your own backend, set the key in `backend/.env` and restart it.
+- **No result appears:** Select English text while holding Ctrl or Alt; keep it within 500 characters. Retry later if the API reports an error or quota limit.
+- **Chrome shows old code:** Reload the extension from the new folder and refresh the webpage.
+- **Chrome local demo:** Enable **Allow access to file URLs** on the extension's Details page, then reload the demo tab.
 
-## গোপনীয়তা
+## Privacy
 
-Lookup চাইলে নির্বাচিত লেখা (সর্বোচ্চ ৫০০ অক্ষর) নির্ধারিত backend-এ যায়; cache-এ না থাকলে Gemini-তেও পাঠানো হতে পারে। অপরিচিত backend-এ গোপন বা সংবেদনশীল লেখা পাঠাবেন না। বিস্তারিত [গোপনীয়তা নীতি](PRIVACY.md)।
+When you request a lookup, the selected text (up to 500 characters) is sent to the configured backend. Text not found in the cache may also be sent to Gemini. Do not send confidential or sensitive text to a backend you do not trust. Read the [privacy policy](PRIVACY.md) for details.
 
-## প্রকল্পের গঠন
+## Project layout
 
 - `chrome/` — Chrome extension source
 - `firefox/` — Firefox extension source
 - `backend/` — Node.js API
-- `dist/` — তৈরি করা download ও unpacked package
-- `docs/setup.md` — setup, API ও release নির্দেশিকা
-- `PRIVACY.md` — গোপনীয়তা নীতি
-- `Requerment.md` — পণ্যের চাহিদা ও গ্রহণযোগ্যতার শর্ত
+- `dist/` — built downloads and unpacked packages
+- `docs/setup.md` — setup, API, and release guide
+- `PRIVACY.md` — privacy policy
+- `Requerment.md` — product requirements and acceptance criteria
